@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Real-Time NIDS Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900 text-slate-100">
+    <div class="min-h-screen flex flex-col">
+      <header
+        class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-10"
+      >
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+              Real-Time Network IDS
+            </h1>
+            <p class="text-xs text-slate-400">
+              Flow-based intrusion detection · ML + rule-based · SOC dashboard
+            </p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span
+              id="ws-status-dot"
+              class="inline-block w-2 h-2 rounded-full bg-red-500"
+            ></span>
+            <span id="ws-status-text" class="text-slate-400">Disconnected</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 max-w-6xl mx-auto px-4 py-4 space-y-4">
+        <!-- KPIs -->
+        <section
+          class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm"
+          id="kpi-section"
+        >
+          <div class="bg-slate-800/60 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400">Total Alerts (session)</p>
+            <p id="kpi-total" class="mt-1 text-2xl font-semibold text-slate-50">0</p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400">Critical / High</p>
+            <p id="kpi-high" class="mt-1 text-2xl font-semibold text-red-400">0</p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400">Distinct Source IPs</p>
+            <p id="kpi-src-ips" class="mt-1 text-2xl font-semibold text-emerald-300">0</p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400">Live Stream</p>
+            <p id="kpi-stream" class="mt-1 text-xs text-slate-300">Waiting for data...</p>
+          </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="bg-slate-800/40 border border-slate-700 rounded-lg p-3">
+          <p class="text-xs text-slate-400 mb-2 font-medium">Filters &amp; search</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="filter-attack" class="rounded border border-slate-600 bg-slate-800 text-slate-200 text-xs px-2 py-1.5 focus:ring-1 focus:ring-emerald-500">
+              <option value="">All attack types</option>
+              <option value="benign">benign</option>
+              <option value="dos">dos</option>
+              <option value="ddos">ddos</option>
+              <option value="port_scan">port_scan</option>
+              <option value="brute_force">brute_force</option>
+              <option value="botnet">botnet</option>
+              <option value="web_attack">web_attack</option>
+              <option value="exploit">exploit</option>
+            </select>
+            <select id="filter-severity" class="rounded border border-slate-600 bg-slate-800 text-slate-200 text-xs px-2 py-1.5">
+              <option value="">All severities</option>
+              <option value="critical">critical</option>
+              <option value="high">high</option>
+              <option value="medium">medium</option>
+              <option value="low">low</option>
+              <option value="info">info</option>
+            </select>
+            <input type="text" id="filter-search" placeholder="Search IP..." class="rounded border border-slate-600 bg-slate-800 text-slate-200 text-xs px-2 py-1.5 w-32" />
+            <select id="filter-sort" class="rounded border border-slate-600 bg-slate-800 text-slate-200 text-xs px-2 py-1.5">
+              <option value="created_at">Newest first</option>
+              <option value="severity">Severity</option>
+              <option value="score">Score</option>
+            </select>
+            <label class="flex items-center gap-1 text-xs text-slate-400">
+              <input type="checkbox" id="filter-dedupe" class="rounded" /> Dedupe
+            </label>
+            <button id="btn-apply-filters" class="px-2 py-1.5 rounded bg-emerald-600 text-white text-xs hover:bg-emerald-500">Apply</button>
+            <button id="btn-refresh-stats" class="px-2 py-1.5 rounded border border-slate-600 text-slate-300 text-xs hover:bg-slate-700">Refresh stats</button>
+          </div>
+        </section>
+
+        <!-- Stats & trends -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400 font-medium mb-2">By severity</p>
+            <div id="stats-by-severity" class="text-xs text-slate-300 space-y-1">—</div>
+          </div>
+          <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3">
+            <p class="text-xs text-slate-400 font-medium mb-2">Top source IPs</p>
+            <div id="stats-top-ips" class="text-xs text-slate-300 space-y-1">—</div>
+          </div>
+        </section>
+
+        <!-- Alerts table -->
+        <section class="bg-slate-900/40 border border-slate-800 rounded-lg">
+          <div class="px-3 py-2 flex items-center justify-between border-b border-slate-800 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold">Alerts</span>
+              <span class="text-slate-500" id="alert-count-label">(0)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-pause" class="px-2 py-1 rounded border border-slate-700 text-slate-200 hover:bg-slate-800">Pause</button>
+              <button id="btn-resume" class="px-2 py-1 rounded border border-emerald-500 text-emerald-300 hover:bg-emerald-500/10 hidden">Resume</button>
+              <button id="btn-clear" class="px-2 py-1 rounded border border-slate-700 text-slate-400 hover:bg-slate-800">Clear</button>
+            </div>
+          </div>
+          <div class="overflow-auto max-h-[480px] text-xs">
+            <table class="min-w-full">
+              <thead class="bg-slate-900/80 sticky top-0 z-10">
+                <tr class="text-slate-400 text-[11px]">
+                  <th class="px-2 py-2 text-left font-normal">Time</th>
+                  <th class="px-2 py-2 text-left font-normal">Severity</th>
+                  <th class="px-2 py-2 text-left font-normal">Attack</th>
+                  <th class="px-2 py-2 text-left font-normal">Source</th>
+                  <th class="px-2 py-2 text-left font-normal">Destination</th>
+                  <th class="px-2 py-2 text-left font-normal">Proto/Port</th>
+                  <th class="px-2 py-2 text-left font-normal">Score</th>
+                  <th class="px-2 py-2 text-left font-normal">Conf.</th>
+                  <th class="px-2 py-2 text-left font-normal">Summary</th>
+                </tr>
+              </thead>
+              <tbody id="alert-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
