@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}History - Insurance Claim Predictor{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-history"></i> Prediction History</h2>
+
+{% if predictions %}
+<div class="table-responsive">
+    <table class="table table-dark table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Customer Details</th>
+                <th>Prediction</th>
+                <th>Confidence</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in predictions %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ p['pred_date'] }}</td>
+            <td>
+                {% set data = json.loads(p['input_data']) %}
+                <small>
+                    Age: <strong>{{ data.get('AGE', '-') }}</strong> |
+                    Gender: <strong>{{ data.get('GENDER', '-') }}</strong> |
+                    Exp: <strong>{{ data.get('DRIVING_EXPERIENCE', '-') }}</strong> |
+                    Vehicle: <strong>{{ data.get('VEHICLE_TYPE', '-') }}</strong> |
+                    Violations: <strong>{{ data.get('SPEEDING_VIOLATIONS', '-') }}</strong>
+                </small>
+            </td>
+            <td>
+                {% if 'Claim Likely' in p['prediction'] %}
+                <span class="badge badge-claim">{{ p['prediction'] }}</span>
+                {% else %}
+                <span class="badge badge-noclaim">{{ p['prediction'] }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="progress" style="min-width: 100px; height: 20px;">
+                    <div class="progress-bar {% if 'Claim Likely' in p['prediction'] %}bg-danger{% else %}bg-success{% endif %}"
+                         style="width: {{ p['confidence'] }}%">{{ p['confidence'] }}%</div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card p-5 text-center">
+    <h4 class="text-muted">No predictions yet</h4>
+    <p>Make your first prediction to see history here.</p>
+    <a href="{{ url_for('predict') }}" class="btn btn-primary"><i class="bi bi-search"></i> Make a Prediction</a>
+</div>
+{% endif %}
+{% endblock %}
