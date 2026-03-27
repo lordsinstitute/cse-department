@@ -1,0 +1,22 @@
+conda install flask
+
+conda install -c anaconda nltk
+
+conda install -c conda-forge spacy
+
+python -m spacy download en_core_web_sm
+
+conda install -c conda-forge tensorflow
+
+conda install -c anaconda scikit-learn
+
+conda install -c anaconda pandas
+
+conda install -c anaconda numpy
+
+cd myapp/
+
+mkdir nltk_data
+
+python -m nltk.downloader
+
