@@ -1,0 +1,27 @@
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 11);
+
+int gasPin = A0;
+int threshold = 400;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+}
+
+void loop() {
+  int gasValue = analogRead(gasPin);
+
+  Serial.println(gasValue);
+  BT.print("Gas: ");
+  BT.println(gasValue);
+
+  if (gasValue > threshold) {
+    BT.println("⚠ GAS DETECTED!");
+  } else {
+    BT.println("Safe");
+  }
+
+  delay(1000);
+}
