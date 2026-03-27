@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Model Accuracy Comparison</div>
+            <div class="card-body"><canvas id="accuracyChart" height="250"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> F1 Score Comparison</div>
+            <div class="card-body"><canvas id="f1Chart" height="250"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Per-Class Accuracy (MobileNetV2)</div>
+            <div class="card-body"><canvas id="perClassChart" height="250"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Your Prediction Distribution</div>
+            <div class="card-body"><canvas id="distChart" height="250"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header"><i class="bi bi-table"></i> Detailed Model Metrics</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th></tr></thead>
+                <tbody id="metricsTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const modelsInfo = {{ models_info|safe }};
+    const gradeCounts = {{ grade_counts|safe }};
+    const gradeColors = {{ grade_colors|safe }};
+    const classNames = {{ class_names|safe }};
+    const modelNames = Object.keys(modelsInfo);
+    const mColors = ['#14b8a6', '#3b82f6', '#f59e0b'];
+
+    // Accuracy Chart
+    new Chart(document.getElementById('accuracyChart'), {
+        type: 'bar',
+        data: {
+            labels: modelNames,
+            datasets: [{ label: 'Accuracy (%)', data: modelNames.map(m => modelsInfo[m].accuracy), backgroundColor: mColors, borderRadius: 6 }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+
+    // F1 Chart
+    new Chart(document.getElementById('f1Chart'), {
+        type: 'bar',
+        data: {
+            labels: modelNames,
+            datasets: [{ label: 'F1 Score (%)', data: modelNames.map(m => modelsInfo[m].f1), backgroundColor: mColors, borderRadius: 6 }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+
+    // Per-Class Accuracy (MobileNetV2)
+    const mobPerClass = modelsInfo['MobileNetV2'] ? modelsInfo['MobileNetV2'].per_class : {};
+    const pcColors = classNames.map(c => gradeColors[c]);
+    new Chart(document.getElementById('perClassChart'), {
+        type: 'bar',
+        data: {
+            labels: classNames,
+            datasets: [{ label: 'Accuracy (%)', data: classNames.map(c => mobPerClass[c] || 0), backgroundColor: pcColors, borderRadius: 6 }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+
+    // Prediction Distribution
+    new Chart(document.getElementById('distChart'), {
+        type: 'doughnut',
+        data: {
+            labels: classNames,
+            datasets: [{ data: classNames.map(c => gradeCounts[c] || 0), backgroundColor: pcColors, borderWidth: 0 }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Metrics Table
+    const tbody = document.getElementById('metricsTable');
+    modelNames.forEach((name, i) => {
+        const m = modelsInfo[name];
+        tbody.innerHTML += `<tr>
+            <td><span style="color:${mColors[i]}"><i class="bi bi-circle-fill"></i></span> ${name}</td>
+            <td>${m.accuracy}%</td><td>${m.precision}%</td><td>${m.recall}%</td><td>${m.f1}%</td>
+        </tr>`;
+    });
+</script>
+{% endblock %}
