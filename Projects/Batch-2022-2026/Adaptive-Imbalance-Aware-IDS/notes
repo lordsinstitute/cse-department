@@ -1,0 +1,283 @@
+
+Backend failed to load in that run because the venv didn’t have the new dependencies (numpy, etc.). Here’s what’s in place and how to run it.
+
+---
+
+## Summary: Full-Stack NIDS Implemented
+
+The project is now a full-stack NIDS with the following pieces.
+
+### Backend (FastAPI)
+
+1. **Config** (`app/config.py`)  
+   JWT, Splunk HEC URL/token/index, drift window/p-value, live capture interface.
+
+2. **DB models** (`app/models.py`)  
+   - `AlertDB`: added `uncertainty`.  
+   - `UserDB`, `AnalystFeedbackDB`, `DriftSnapshotDB`, `TrainingRunDB` for auth, feedback, drift, and training runs.
+
+3. **Multi-dataset loaders** (`app/data/datasets.py`)  
+   - **NSL-KDD**, **CIC-IDS2018**, **BoT-IoT** parsers and `get_dataset_path()` for all supported names.
+
+4. **SVM training** (`app/ml/svm_pipeline.py`)  
+   - Class-weighted SVM (`class_weight='balanced'`), `StandardScaler`, optional calibration for `predict_proba`.  
+   - Metrics: F1 weighted/macro, **minority recall** (min per-class recall), per-class recall.  
+   - `run_svm_pipeline()` saves model + scaler + feature order.
+
+5. **Inference** (`app/ml/inference.py`)  
+   - Supports SVM bundle (model + scaler + label encoder).  
+   - Returns **uncertainty** = 1 − max(proba); confidence unchanged.
+
+6. **Drift** (`app/services/drift.py`)  
+   - Baseline + recent buffer; per-feature t-test p-value; optional DB snapshots; `push_recent()` used from ingest.
+
+7. **Explainability** (`app/ml/explainability.py`)  
+   - Global feature importance (RF `feature_importances_` or SVM `coef_`).  
+   - Per-alert explanation: feature values + importance + top contributors + prediction.
+
+8. **Splunk HEC** (`app/services/splunk_hec.py`)  
+   - `send_alert_to_splunk(alert)` when `SPLUNK_HEC_URL` and `SPLUNK_HEC_TOKEN` are set.
+
+9. **Analyst feedback**  
+   - `POST/GET /api/feedback` (create/list), stored in `analyst_feedback` table.
+
+10. **PCAP upload**  
+    - `POST /ingest/pcap`: upload file → parse flows → validate → score → store alert → WebSocket + Splunk + drift push.
+
+11. **Batch ingest**  
+    - `POST /ingest/flows/batch`: multiple flows in one request (e.g. for live/simulator).
+
+12. **Auth**  
+    - `app/core/auth.py`: JWT create/decode, bcrypt password.  
+    - `POST /api/auth/login` (form), `POST /api/auth/register`.  
+    - Optional dependency `get_current_user_optional` for feedback.
+
+13. **Routers**  
+    - `auth_router`, `feedback_router`, `training_router`, `explain_router`, `ingest_router` registered in `main.py`.  
+    - Training: `POST /api/training/run` (body: datasets, class_weight, C), `GET /api/training/runs`, `GET /api/training/datasets`.  
+    - Explain: `GET /api/explain/global`, `POST /api/explain/alert/{id}`, `POST /api/explain/flow`.  
+    - Drift: `GET /api/drift`, `GET /api/drift/history`.
+
+14. **Main**  
+    - All new tables created via `Base.metadata.create_all`.  
+    - On each ingested flow: `push_recent(features)` and `send_alert_to_splunk(alert)`.
+
+15. **Seed user**  
+    - `scripts/create_user.py`: creates `admin` / `admin` for login.
+
+### Frontend (Next.js, SOC-style dark UI)
+
+1. **Setup**  
+   - `package.json` (Next 14, React 18, recharts, lucide-react, Tailwind).  
+   - `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`, `next.config.js`.  
+   - `.env.local.example`: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL`.
+
+2. **App**  
+   - `app/globals.css`: dark theme (--bg-primary, severity colors).  
+   - `app/layout.tsx`, `app/page.tsx` (home + links to Login / Dashboard).  
+   - `app/login/page.tsx`: form login → JWT in `localStorage` → redirect to dashboard.
+
+3. **Dashboard** (`app/dashboard/`)  
+   - **Layout**: nav to Alerts, Explain, Feedback, Drift, Training.  
+   - **Alerts** (`page.tsx`): WebSocket for live alerts; stats (total, by severity, by attack type); bar/pie charts (recharts); table with severity badges, confidence/uncertainty; links to Explain and Feedback.  
+   - **Explain** (`explain/page.tsx`): `?id=<alert_id>` → POST `/api/explain/alert/:id`; shows prediction and top contributors; GET `/api/explain/global` for global importance.  
+   - **Feedback** (`feedback/page.tsx`): list feedback; form for `alert_id` (from `?alert_id=`), correct label, comment → POST `/api/feedback`.  
+   - **Drift** (`drift/page.tsx`): GET `/api/drift` and `/api/drift/history`; table of per-feature drift and history.  
+   - **Training** (`training/page.tsx`): GET datasets and runs; checkboxes to select datasets → POST `/api/training/run`; table of runs with status and metrics.
+
+4. **API client**  
+   - `lib/api.ts`: `api()`, `wsUrl()`, token from `localStorage`.
+
+### How to run
+
+**Backend (install new deps first):**
+
+```bash
+cd backend
+.venv\Scripts\activate
+pip install -r requirements.txt
+python scripts/create_user.py
+uvicorn app.main:app --reload --host 0.0.0.0 --port 9000
+```
+pip uninstall bcrypt -y 
+pip install bcrypt==3.2.2
+pip install passlib --upgrade
+
+**Frontend:**
+
+```bash
+cd frontend
+cp .env.local.example .env.local
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`, then **Dashboard**. Alerts and charts use `http://127.0.0.1:9000` and `ws://127.0.0.1:9000` by default (override via `.env.local`).  
+To generate traffic: `python -m app.simulator` from the backend directory, or use **Training** to run SVM on configured datasets and **Explain** / **Feedback** / **Drift** from the dashboard.
+
+index=main sourcetype="nids:alert"
+
+{
+  "src_ip": "1.1.1.1",
+  "dst_ip": "2.2.2.2",
+  "src_port": 4444,
+  "dst_port": 80,
+  "protocol": "TCP",
+  "bytes_sent": 999999,
+  "bytes_received": 1,
+  "packets_sent": 1000,
+  "packets_received": 1
+}
+{
+  "src_ip": "string",
+  "dst_ip": "string",
+  "src_port": 0,
+  "dst_port": 0,
+
+  "protocol": "TCP",
+  "bytes_sent": 0,
+  "bytes_received": 0,
+  "packets_sent": 0,
+  "packets_received": 0,
+  "start_time": "2026-02-17T21:21:42.449Z",
+  "end_time": "2026-02-17T21:21:42.449Z"
+}
+a04a5566-63fa-4160-b996-544b22218827
+
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+Invoke-RestMethod `
+ -Uri https://localhost:8088/services/collector `
+ -Method POST `
+ -Headers @{ Authorization = "Splunk a04a5566-63fa-4160-b996-544b22218827" } `
+ -Body '{"event":"INDEX_TEST","index":"main","sourcetype":"manual:test"}' `
+ -ContentType "application/json"
+
+
+
+if not SPLUNK_HEC_URL or not SPLUNK_HEC_TOKEN:
+        return False
+    payload = {
+        "event": alert,
+        "sourcetype": "nids:alert",
+        "index": SPLUNK_INDEX,
+    }
+    headers = {
+        "Authorization": f"Splunk {SPLUNK_HEC_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    try:
+        r = requests.post(SPLUNK_HEC_URL, json=payload, headers=headers, timeout=5)
+        if r.status_code in (200, 201):
+            return True
+        logger.warning("Splunk HEC returned %s: %s", r.status_code, r.text[:200])
+    except Exception as e:
+        logger.warning("Splunk HEC send failed: %s", e)
+    return False
+
+
+import requests
+import json
+from datetime import datetime
+from app.config import SPLUNK_HEC_TOKEN, SPLUNK_HEC_URL, SPLUNK_INDEX
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+qqq
+def send_alert_to_splunk(alert: dict) -> bool:
+    if not SPLUNK_HEC_URL or not SPLUNK_HEC_TOKEN:
+        return False
+
+    def json_safe(obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return obj
+
+    try:
+        payload = {
+            "event": alert,
+            "sourcetype": "nids:alert",
+            "index": SPLUNK_INDEX,
+        }
+
+        safe_payload = json.loads(json.dumps(payload, default=json_safe))
+
+        headers = {
+            "Authorization": f"Splunk {SPLUNK_HEC_TOKEN}",
+            "Content-Type": "application/json",
+        }
+
+        r = requests.post(
+            SPLUNK_HEC_URL,
+            json=safe_payload,
+            headers=headers,
+            timeout=5,
+            verify=False
+        )
+
+        if r.status_code in (200, 201):
+            return True
+
+        logger.warning("Splunk HEC returned %s: %s", r.status_code, r.text[:200])
+
+    except Exception as e:
+        logger.warning("Splunk HEC send failed: %s", e)
+
+    return False
+
+
+xx
+"""
+Splunk HTTP Event Collector (HEC) integration.
+
+Sends alert events to Splunk when SPLUNK_HEC_URL and SPLUNK_HEC_TOKEN are set.
+"""
+
+import json
+from typing import Any, Dict, Optional
+
+import requests
+
+from app.config import SPLUNK_HEC_TOKEN, SPLUNK_HEC_URL, SPLUNK_INDEX
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def send_alert_to_splunk(alert: Dict[str, Any]) -> bool:
+    """
+    POST a single alert to Splunk HEC.
+    Returns True if sent successfully, False otherwise.
+    """
+    if not SPLUNK_HEC_URL or not SPLUNK_HEC_TOKEN:
+        return False
+    from datetime import datetime
+
+def serialize(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    return obj
+
+safe_alert = {k: serialize(v) for k, v in alert.items()}
+
+payload = {
+    "event": safe_alert,
+    "sourcetype": "nids:alert",
+    "index": SPLUNK_INDEX,
+}
+
+headers = {
+        "Authorization": f"Splunk {SPLUNK_HEC_TOKEN}",
+        "Content-Type": "application/json",
+}
+try:
+    r = requests.post(SPLUNK_HEC_URL, json=payload, headers=headers, timeout=5)
+    if r.status_code in (200, 201):
+        return True
+    logger.warning("Splunk HEC returned %s: %s", r.status_code, r.text[:200])
+except Exception as e:
+    logger.warning("Splunk HEC send failed: %s", e)
+return False
+
+
