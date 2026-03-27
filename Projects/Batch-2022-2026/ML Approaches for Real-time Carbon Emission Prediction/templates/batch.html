@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Batch Prediction — Carbon Emission Prediction{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-zone {
+        border: 2px dashed rgba(16, 185, 129, 0.3);
+        border-radius: 12px; padding: 2rem; text-align: center;
+        background: rgba(16, 185, 129, 0.04);
+        transition: border-color 0.3s;
+    }
+    .upload-zone:hover { border-color: rgba(16, 185, 129, 0.6); }
+    .batch-table th { font-size: 0.8rem; }
+    .batch-table td { font-size: 0.82rem; }
+    .rating-dot {
+        width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-2"><i class="bi bi-file-earmark-spreadsheet"></i> Batch Prediction</h2>
+<p class="text-muted mb-4">Upload a CSV file with multiple vehicles and get CO2 predictions for all at once.</p>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-upload"></i> Upload CSV</div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="upload-zone mb-3">
+                        <i class="bi bi-cloud-arrow-up text-emerald" style="font-size: 2.5rem;"></i>
+                        <p class="mt-2 mb-1">Choose a CSV file</p>
+                        <input type="file" name="csv_file" accept=".csv" class="form-control mt-2" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="bi bi-play-fill"></i> Run Batch Prediction
+                    </button>
+                </form>
+                <hr style="border-color: rgba(255,255,255,0.1);">
+                <a href="/batch/template" class="btn btn-outline-emerald w-100 mb-2">
+                    <i class="bi bi-download"></i> Download Sample Template
+                </a>
+                <div class="mt-3">
+                    <h6 class="text-emerald">Required CSV Columns:</h6>
+                    <div style="font-size: 0.8rem; color: #aaa;">
+                        {% for col in categorical_options.keys() %}
+                        <code>{{ col }}</code>,
+                        {% endfor %}
+                        {% for col in numeric_ranges.keys() %}
+                        <code>{{ col }}</code>{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if results is not none %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-table"></i> Results ({{ results|length }} vehicles)</span>
+                <form method="POST" action="/batch/download" class="d-inline">
+                    <input type="hidden" name="results_data" value='{{ results|tojson }}'>
+                    <button type="submit" class="btn btn-sm btn-outline-emerald">
+                        <i class="bi bi-download"></i> Download CSV
+                    </button>
+                </form>
+            </div>
+            <div class="card-body">
+                {% if errors %}
+                <div class="alert alert-warning py-2" style="font-size: 0.85rem;">
+                    <strong>Skipped rows:</strong>
+                    <ul class="mb-0 mt-1">
+                        {% for e in errors %}
+                        <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if results %}
+                <div class="table-responsive">
+                    <table class="table table-sm batch-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Make</th>
+                                <th>Class</th>
+                                <th>Fuel</th>
+                                <th>Engine</th>
+                                <th>CO2 (g/km)</th>
+                                <th>CI</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                            <tr>
+                                <td>{{ r.row }}</td>
+                                <td>{{ r.make }}</td>
+                                <td>{{ r.vehicle_class }}</td>
+                                <td>{{ r.fuel_type }}</td>
+                                <td>{{ r.engine }}L</td>
+                                <td style="font-weight: 700; color: {{ r.color }};">{{ r.co2 }}</td>
+                                <td style="font-size: 0.75rem; color: #888;">{{ r.conf_low }}–{{ r.conf_high }}</td>
+                                <td>
+                                    <span class="rating-dot" style="background: {{ r.color }};"></span>
+                                    {{ r.rating }}/10
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary stats -->
+                {% set avg_co2 = (results|map(attribute='co2')|sum / results|length)|round(1) %}
+                {% set min_co2 = results|map(attribute='co2')|min %}
+                {% set max_co2 = results|map(attribute='co2')|max %}
+                <div class="row g-2 mt-2">
+                    <div class="col-4">
+                        <div class="stat-card py-2">
+                            <h5 class="text-emerald mb-0">{{ avg_co2 }}</h5>
+                            <p style="font-size: 0.75rem;">Avg CO2 g/km</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card py-2">
+                            <h5 style="color: #22c55e; margin-bottom: 0;">{{ min_co2 }}</h5>
+                            <p style="font-size: 0.75rem;">Lowest</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card py-2">
+                            <h5 style="color: #ef4444; margin-bottom: 0;">{{ max_co2 }}</h5>
+                            <p style="font-size: 0.75rem;">Highest</p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No valid rows found in the CSV file.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-file-earmark-spreadsheet text-emerald" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-emerald">Upload a CSV File</h4>
+                <p class="text-muted">Prepare a CSV with vehicle specifications and get predictions for all vehicles at once. Download the template to get started.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

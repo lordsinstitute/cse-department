@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}History — Carbon Emission Prediction{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-history"></i> Prediction History</h2>
+
+{% if predictions %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Make</th>
+                        <th>Class</th>
+                        <th>Engine</th>
+                        <th>Fuel Type</th>
+                        <th>CO2 (g/km)</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    {% set inp = json.loads(pred['input_data']) %}
+                    <tr>
+                        <td class="text-muted">{{ pred['id'] }}</td>
+                        <td class="text-muted small">{{ pred['pred_date'][:16] }}</td>
+                        <td>{{ pred['username'] }}</td>
+                        <td>{{ inp.get('Make', '-') }}</td>
+                        <td>{{ inp.get('Vehicle_Class', '-') }}</td>
+                        <td>{{ inp.get('Engine_Size', '-') }}L</td>
+                        <td>{{ inp.get('Fuel_Type', '-') }}</td>
+                        <td style="color: {{ get_co2_color(pred['co2_rating']) }}; font-weight: 700;">
+                            {{ pred['predicted_co2'] }}
+                        </td>
+                        <td>
+                            <span class="badge" style="background: {{ get_co2_color(pred['co2_rating']) }};">
+                                {{ pred['co2_rating'] }}/10 — {{ get_co2_label(pred['co2_rating']) }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-clock-history text-muted" style="font-size: 3rem;"></i>
+        <p class="text-muted mt-3">No predictions yet. <a href="/predict">Make your first prediction</a>.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

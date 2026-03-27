@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Compare Vehicles — Carbon Emission Prediction{% endblock %}
+
+{% block extra_css %}
+<style>
+    .vehicle-panel {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+    .vehicle-panel h5 { color: #10b981; font-weight: 700; }
+    .compare-result {
+        text-align: center; padding: 1rem;
+        background: rgba(255,255,255,0.03); border-radius: 10px;
+    }
+    .compare-co2 { font-size: 2.2rem; font-weight: 800; }
+    .compare-bar {
+        height: 24px; border-radius: 12px; margin: 0.3rem 0;
+        transition: width 0.5s ease;
+    }
+    .winner-badge {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white; font-weight: 700; padding: 0.3rem 0.8rem;
+        border-radius: 20px; font-size: 0.8rem;
+    }
+    .warning-box { background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 8px; padding: 0.5rem 0.8rem; margin-top: 0.5rem; }
+    .warning-box li { font-size: 0.8rem; color: #eab308; }
+    .rec-item { font-size: 0.8rem; padding: 0.2rem 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-2"><i class="bi bi-columns-gap"></i> Vehicle Comparison</h2>
+<p class="text-muted mb-4">Compare up to 3 vehicles side-by-side. Use presets for quick fill or enter custom specs.</p>
+
+<form method="POST" id="compareForm">
+    <div class="row g-3">
+        {% for i in range(1, 4) %}
+        <div class="col-md-4">
+            <div class="vehicle-panel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5><i class="bi bi-car-front"></i> Vehicle {{ i }}</h5>
+                    {% if i > 1 %}<small class="text-muted">(optional)</small>{% endif %}
+                </div>
+                <div class="mb-2">
+                    <label class="form-label" style="font-size:0.8rem;">Load Preset</label>
+                    <select class="form-select form-select-sm" onchange="loadPreset({{ i }}, this.value)">
+                        <option value="">— Custom —</option>
+                        {% for name in preset_names %}
+                        <option value="{{ name }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% for col, options in categorical_options.items() %}
+                <div class="mb-2">
+                    <label class="form-label" style="font-size:0.8rem;">{{ col.replace('_', ' ') }}</label>
+                    <select name="v{{ i }}_{{ col }}" id="v{{ i }}_{{ col }}" class="form-select form-select-sm" {% if i == 1 %}required{% endif %}>
+                        {% if i > 1 %}<option value="">—</option>{% endif %}
+                        {% for opt in options %}
+                        <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+                {% for col, cfg in numeric_ranges.items() %}
+                <div class="mb-2">
+                    <label class="form-label" style="font-size:0.8rem;">
+                        {{ col.replace('_', ' ') }}{% if cfg.unit %} ({{ cfg.unit }}){% endif %}
+                    </label>
+                    <input type="number" name="v{{ i }}_{{ col }}" id="v{{ i }}_{{ col }}" class="form-control form-control-sm"
+                           min="{{ cfg.min }}" max="{{ cfg.max }}" step="{{ cfg.step }}" value="{{ cfg.default }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary-custom btn-lg">
+            <i class="bi bi-columns-gap"></i> Compare Vehicles
+        </button>
+    </div>
+</form>
+
+{% if results %}
+<hr class="my-4" style="border-color: rgba(16,185,129,0.2);">
+<h4 class="text-emerald mb-3"><i class="bi bi-clipboard2-pulse"></i> Comparison Results</h4>
+
+{% set max_co2 = results|map(attribute='co2')|max %}
+{% set min_co2 = results|map(attribute='co2')|min %}
+
+<div class="row g-3 mb-4">
+    {% for r in results %}
+    <div class="col-md-{{ 12 // results|length }}">
+        <div class="compare-result" style="border: 2px solid {{ r.color }}; {% if r.co2 == min_co2 and results|length > 1 %}box-shadow: 0 0 15px rgba(16,185,129,0.3);{% endif %}">
+            {% if r.co2 == min_co2 and results|length > 1 %}
+            <div class="mb-2"><span class="winner-badge"><i class="bi bi-trophy"></i> Greenest</span></div>
+            {% endif %}
+            <div class="text-muted" style="font-size:0.85rem;">Vehicle {{ r.vehicle_num }}</div>
+            <div class="compare-co2" style="color: {{ r.color }};">{{ r.co2 }} <small style="font-size:0.4em;color:#aaa;">g/km</small></div>
+            {% if r.conf_low != r.conf_high %}
+            <div style="font-size:0.75rem;color:#888;">CI: {{ r.conf_low }} — {{ r.conf_high }}</div>
+            {% endif %}
+            <span class="badge mt-1" style="background:{{ r.color }};">{{ r.label }} — {{ r.rating }}/10</span>
+            <div class="mt-2" style="font-size:0.85rem;">
+                <strong>{{ r.specs.Make }}</strong> · {{ r.specs.Vehicle_Class }}<br>
+                {{ r.specs.Engine_Size }}L · {{ r.specs.Fuel_Type }}
+            </div>
+            <div style="font-size:0.8rem;color:#aaa;margin-top:0.5rem;">
+                <i class="bi bi-tree text-emerald"></i> {{ r.footprint.annual_tonnes }} t/yr · {{ r.footprint.trees_needed }} trees
+            </div>
+            {% if r.warnings %}
+            <div class="warning-box">
+                <ul class="mb-0 ps-3">{% for w in r.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+            </div>
+            {% endif %}
+            {% if r.recommendations %}
+            <div class="mt-2 text-start">
+                {% for rec in r.recommendations %}
+                <div class="rec-item"><i class="bi bi-check-circle text-emerald me-1"></i>{{ rec }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Visual bar comparison -->
+<div class="card">
+    <div class="card-header"><i class="bi bi-bar-chart"></i> CO2 Comparison</div>
+    <div class="card-body">
+        {% for r in results %}
+        <div class="d-flex align-items-center mb-2">
+            <div style="width:120px;font-size:0.85rem;">Vehicle {{ r.vehicle_num }}</div>
+            <div class="flex-grow-1">
+                <div class="compare-bar" style="width: {{ (r.co2 / max_co2 * 100) if max_co2 > 0 else 0 }}%; background: {{ r.color }};">
+                    <span style="padding-left:8px;font-size:0.75rem;color:white;font-weight:700;">{{ r.co2 }} g/km</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const presets = {{ presets_json|safe }};
+
+    function loadPreset(vehicleNum, presetName) {
+        if (!presetName || !presets[presetName]) return;
+        const p = presets[presetName];
+        const prefix = 'v' + vehicleNum + '_';
+        for (const [key, value] of Object.entries(p)) {
+            const el = document.getElementById(prefix + key);
+            if (el) el.value = value;
+        }
+    }
+</script>
+{% endblock %}
