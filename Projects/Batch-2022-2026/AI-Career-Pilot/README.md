@@ -250,4 +250,4 @@ We welcome contributions to make AI Career Pilot even smarter!
 
 **Author:** Mohammed Fawzaan
 
-*Built with ❤️, Next.js, and Google Gemini.*
+*Built with ❤️, Next.js and Google Gemini.*
