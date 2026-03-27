@@ -1,0 +1,58 @@
+{
+  "best_model": "Gradient Boosting",
+  "feature_order": [
+    "longitude",
+    "latitude",
+    "housing_median_age",
+    "total_rooms",
+    "total_bedrooms",
+    "population",
+    "households",
+    "median_income",
+    "ocean_proximity_encoded"
+  ],
+  "ocean_map": {
+    "<1H OCEAN": 0,
+    "INLAND": 1,
+    "ISLAND": 2,
+    "NEAR BAY": 3,
+    "NEAR OCEAN": 4
+  },
+  "results": {
+    "Linear Regression": {
+      "R2": 0.8456,
+      "Adj_R2": 0.8449,
+      "MAE": 24236.91,
+      "MSE": 916766458.45,
+      "RMSE": 30278.15
+    },
+    "Ridge Regression": {
+      "R2": 0.8456,
+      "Adj_R2": 0.8449,
+      "MAE": 24236.94,
+      "MSE": 916765604.53,
+      "RMSE": 30278.14
+    },
+    "Decision Tree": {
+      "R2": 0.8457,
+      "Adj_R2": 0.845,
+      "MAE": 23856.7,
+      "MSE": 915840288.74,
+      "RMSE": 30262.85
+    },
+    "Random Forest": {
+      "R2": 0.8826,
+      "Adj_R2": 0.8821,
+      "MAE": 21193.21,
+      "MSE": 696838624.11,
+      "RMSE": 26397.7
+    },
+    "Gradient Boosting": {
+      "R2": 0.8924,
+      "Adj_R2": 0.8919,
+      "MAE": 20266.98,
+      "MSE": 638712473.37,
+      "RMSE": 25272.76
+    }
+  }
+}
