@@ -1,0 +1,43 @@
+#include <Servo.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 11);
+
+Servo servo1;
+Servo servo2;
+
+int currentX = 90, currentY = 90;
+int targetX, targetY;
+
+void setup() {
+  BT.begin(9600);
+  servo1.attach(5);
+  servo2.attach(6);
+
+  servo1.write(currentX);
+  servo2.write(currentY);
+}
+
+void loop() {
+  if (BT.available()) {
+    String data = BT.readStringUntil('\n');
+
+    int commaIndex = data.indexOf(',');
+    if (commaIndex > 0) {
+      targetX = data.substring(0, commaIndex).toInt();
+      targetY = data.substring(commaIndex + 1).toInt();
+    }
+  }
+
+  // Smooth movement
+  if (currentX < targetX) currentX++;
+  if (currentX > targetX) currentX--;
+
+  if (currentY < targetY) currentY++;
+  if (currentY > targetY) currentY--;
+
+  servo1.write(currentX);
+  servo2.write(currentY);
+
+  delay(10); // smooth & fast
+}
