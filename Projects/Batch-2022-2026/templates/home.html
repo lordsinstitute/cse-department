@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-house"></i> Welcome, {{ session.get('name', 'User') }}</h2>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ total_scans }}</h3>
+            <p><i class="bi bi-image"></i> Total Scans</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3 class="text-danger">{{ stroke_count }}</h3>
+            <p><i class="bi bi-exclamation-triangle"></i> Stroke Detected</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3 class="text-success">{{ normal_count }}</h3>
+            <p><i class="bi bi-check-circle"></i> Normal Results</p>
+        </div>
+    </div>
+</div>
+
+{% if admin_stats %}
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-shield-check"></i> Admin Statistics</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>{{ admin_stats.total_users }}</h3>
+                    <p><i class="bi bi-people"></i> Total Users</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>{{ admin_stats.total_scans }}</h3>
+                    <p><i class="bi bi-images"></i> All Scans</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3 class="text-danger">{{ admin_stats.stroke_count }}</h3>
+                    <p><i class="bi bi-exclamation-triangle"></i> All Strokes</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3 class="text-success">{{ admin_stats.normal_count }}</h3>
+                    <p><i class="bi bi-check-circle"></i> All Normal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Quick Actions -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-lightning"></i> Quick Actions</div>
+            <div class="card-body">
+                <a href="{{ url_for('predict') }}" class="btn btn-scan w-100 mb-3">
+                    <i class="bi bi-upload"></i> Upload CT Scan for Analysis
+                </a>
+                <a href="{{ url_for('history') }}" class="btn btn-outline-blue w-100 mb-3">
+                    <i class="bi bi-clock-history"></i> View Scan History
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-blue w-100">
+                    <i class="bi bi-speedometer2"></i> View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Images -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-download"></i> Sample Test Images</div>
+            <div class="card-body">
+                <p class="text-muted">Download sample CT images to test the prediction system:</p>
+                {% if samples %}
+                <div class="row g-2">
+                    {% for sample in samples %}
+                    <div class="col-6">
+                        <a href="{{ url_for('download_sample', filename=sample) }}"
+                           class="btn btn-sm {% if 'stroke' in sample %}btn-outline-danger{% else %}btn-outline-success{% endif %} w-100">
+                            <i class="bi bi-download"></i> {{ sample }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No sample images available. Run generate_dataset.py first.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Scans -->
+{% if recent %}
+<div class="card mt-4">
+    <div class="card-header"><i class="bi bi-clock"></i> Recent Scans</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in recent %}
+                    <tr>
+                        <td>
+                            <img src="/{{ scan['image_path'] }}" alt="CT Scan"
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+                        </td>
+                        <td>
+                            {% if scan['prediction'] == 'Stroke Detected' %}
+                            <span class="badge badge-stroke"><i class="bi bi-exclamation-triangle"></i> {{ scan['prediction'] }}</span>
+                            {% else %}
+                            <span class="badge badge-normal"><i class="bi bi-check-circle"></i> {{ scan['prediction'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ scan['confidence'] }}%</td>
+                        <td>{{ scan['scan_date'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
