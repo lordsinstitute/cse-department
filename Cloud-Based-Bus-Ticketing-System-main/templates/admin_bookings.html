@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center mb-4">All Bookings</h2>
+{% if bookings %}
+<table class="table table-dark table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Phone</th>
+            <th>Bus</th>
+            <th>Route</th>
+            <th>Passenger</th>
+            <th>Seats</th>
+            <th>Fare</th>
+            <th>Travel Date</th>
+            <th>Payment</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.user_name }}</td>
+            <td>{{ b.user_phone or '—' }}</td>
+            <td>{{ b.bus_name }}<br><small>{{ b.bus_number }}</small></td>
+            <td>{{ b.source }} → {{ b.destination }}</td>
+            <td>{{ b.passenger_name }}</td>
+            <td>{{ b.seats }}</td>
+            <td>Rs. {{ "%.2f"|format(b.total_fare) }}</td>
+            <td>{{ b.travel_date }}</td>
+            <td>{{ b.payment_method }}<br><small>{{ b.payment_status }}</small></td>
+            <td><span class="badge bg-{{ 'success' if b.status == 'Confirmed' else 'secondary' }}">{{ b.status }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="text-center mt-5">
+    <p class="lead">No bookings yet.</p>
+</div>
+{% endif %}
+{% endblock %}
