@@ -1,0 +1,164 @@
+{% extends "ml/ml_layout.html" %}
+
+{% block mlcontent %}
+
+<style>
+
+.matrix-img{
+cursor:pointer;
+border-radius:8px;
+transition:0.3s;
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.matrix-img:hover{
+transform:scale(1.05);
+}
+
+.report-box{
+background:#111;
+color:#00ff9c;
+padding:15px;
+border-radius:8px;
+font-size:13px;
+white-space:pre-wrap;
+}
+
+</style>
+
+<h3 class="mb-4">
+<i class="fa-solid fa-chart-column"></i>
+Algorithm Comparison
+</h3>
+
+<!-- Accuracy Comparison Chart -->
+
+<div class="card shadow mb-5">
+
+<div class="card-header bg-primary text-white">
+Model Accuracy Comparison
+</div>
+
+<div class="card-body text-center">
+
+<img src="/static/eval/model_accuracy_comparison.png"
+class="img-fluid matrix-img"
+data-bs-toggle="modal"
+data-bs-target="#imgModal"
+onclick="showMatrix('model_accuracy_comparision.png')">
+
+</div>
+
+</div>
+
+<!-- Confusion Matrices -->
+
+<h5 class="mb-3">Confusion Matrices</h5>
+
+<div class="row">
+
+{% for m in matrices %}
+
+<div class="col-md-4 mb-4 text-center">
+
+<img src="/static/eval/{{m}}"
+class="img-fluid matrix-img"
+data-bs-toggle="modal"
+data-bs-target="#imgModal"
+onclick="showMatrix('{{m}}')">
+
+<p class="mt-2">
+{{ m.replace("confusion_","").replace(".png","") }}
+</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<!-- Classification Reports -->
+
+<h5 class="mt-5 mb-3">Classification Reports</h5>
+
+<div class="row">
+
+{% for r in reports %}
+
+<div class="col-md-6 mb-4">
+
+<div class="card shadow">
+
+<div class="card-header bg-dark text-white">
+
+{{ r.replace("classification_report_","").replace(".txt","") }}
+
+</div>
+
+<div class="card-body">
+
+<pre id="report_{{loop.index}}" class="report-box">
+
+Loading report...
+
+</pre>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+fetch("/static/eval/{{r}}")
+.then(res=>res.text())
+.then(data=>{
+document.getElementById("report_{{loop.index}}").textContent=data
+})
+
+</script>
+
+{% endfor %}
+
+</div>
+
+<!-- Modal for images -->
+
+<div class="modal fade" id="imgModal">
+
+<div class="modal-dialog modal-xl modal-dialog-centered">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5 class="modal-title">Visualization</h5>
+
+<button class="btn-close" data-bs-dismiss="modal"></button>
+
+</div>
+
+<div class="modal-body text-center">
+
+<img id="modalImg" class="img-fluid">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showMatrix(img){
+
+document.getElementById("modalImg").src="/static/eval/"+img
+
+}
+
+</script>
+
+{% endblock %}

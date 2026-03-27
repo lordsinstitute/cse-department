@@ -1,0 +1,96 @@
+{% extends "ml/ml_layout.html" %}
+
+{% block mlcontent %}
+
+<style>
+
+.eda-img{
+cursor:pointer;
+border-radius:8px;
+transition:0.3s;
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.eda-img:hover{
+transform:scale(1.05);
+box-shadow:0 6px 18px rgba(0,0,0,0.4);
+}
+
+.modal-img{
+width:100%;
+border-radius:6px;
+}
+
+</style>
+
+<h3 class="mb-4">
+<i class="fa-solid fa-chart-line"></i>
+EDA Visualizations
+</h3>
+
+<div class="row">
+
+{% for img in images %}
+
+<div class="col-md-4 mb-4 text-center">
+
+<img src="/static/eda/{{img}}"
+class="img-fluid eda-img"
+data-bs-toggle="modal"
+data-bs-target="#imgModal"
+onclick="showImg('{{img}}')">
+
+<p class="mt-2 text-muted">
+{{ img.replace("_"," ").replace(".png","") }}
+</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="imgModal" tabindex="-1">
+
+<div class="modal-dialog modal-xl modal-dialog-centered">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5 class="modal-title" id="modalTitle"></h5>
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="modal"></button>
+
+</div>
+
+<div class="modal-body text-center">
+
+<img id="modalImg" class="modal-img">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showImg(img){
+
+document.getElementById("modalImg").src="/static/eda/"+img
+
+document.getElementById("modalTitle").innerText =
+img.replace("_"," ").replace(".png","")
+
+}
+
+</script>
+
+{% endblock %}
