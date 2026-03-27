@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Register' if register else 'Login' }} — Carbon Emission Prediction{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-cloud-haze2 text-emerald"></i>
+                    Carbon Emission Prediction
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="mb-3">
+                    {% if register %}
+                    <i class="bi bi-person-plus"></i> Create Account
+                    {% else %}
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    {% endif %}
+                </h5>
+
+                <form method="POST" action="{{ url_for('register') if register else url_for('login') }}">
+                    {% if register %}
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                        {% if register %}
+                        <i class="bi bi-person-plus"></i> Register
+                        {% else %}
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                        {% endif %}
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    {% if register %}
+                    <span class="text-muted">Already have an account?</span>
+                    <a href="{{ url_for('login') }}">Sign In</a>
+                    {% else %}
+                    <span class="text-muted">Don't have an account?</span>
+                    <a href="{{ url_for('register') }}">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

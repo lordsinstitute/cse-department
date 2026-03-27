@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Home — Carbon Emission Prediction{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-house"></i> Dashboard Overview</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ total_preds }}</h3>
+            <p><i class="bi bi-calculator"></i> Total Predictions</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ avg_co2 }} g/km</h3>
+            <p><i class="bi bi-cloud-haze2"></i> Average CO2</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ avg_rating }}/10</h3>
+            <p><i class="bi bi-star"></i> Average Rating</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Recent Predictions
+            </div>
+            <div class="card-body">
+                {% if recent %}
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vehicle</th>
+                                <th>CO2</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in recent %}
+                            {% set inp = json.loads(pred['input_data']) %}
+                            <tr>
+                                <td class="text-muted small">{{ pred['pred_date'][:16] }}</td>
+                                <td>{{ inp.get('Make', '') }} {{ inp.get('Vehicle_Class', '') }}</td>
+                                <td style="color: {{ get_co2_color(pred['co2_rating']) }}; font-weight: 600;">
+                                    {{ pred['predicted_co2'] }} g/km
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: {{ get_co2_color(pred['co2_rating']) }};">
+                                        {{ pred['co2_rating'] }}/10
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No predictions yet. <a href="/predict">Make your first prediction</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <a href="/predict" class="btn btn-primary-custom w-100 mb-3">
+                    <i class="bi bi-calculator"></i> New Prediction
+                </a>
+                <a href="/dashboard" class="btn btn-outline-emerald w-100 mb-3">
+                    <i class="bi bi-speedometer2"></i> View Model Performance
+                </a>
+                <a href="/history" class="btn btn-outline-emerald w-100">
+                    <i class="bi bi-clock-history"></i> View History
+                </a>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> CO2 Rating Scale
+            </div>
+            <div class="card-body">
+                <div class="mb-1"><span class="badge" style="background:#22c55e;">8-10</span> Excellent (<180 g/km)</div>
+                <div class="mb-1"><span class="badge" style="background:#84cc16;color:#1a1a2e;">6-7</span> Good (180-250 g/km)</div>
+                <div class="mb-1"><span class="badge" style="background:#eab308;color:#1a1a2e;">4-5</span> Moderate (250-350 g/km)</div>
+                <div><span class="badge" style="background:#ef4444;">1-3</span> High (>350 g/km)</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

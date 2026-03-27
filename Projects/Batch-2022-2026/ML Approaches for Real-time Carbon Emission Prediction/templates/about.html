@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}About — Carbon Emission Prediction{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> About This Project</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-cloud-haze2"></i> Carbon Emissions & Vehicles</div>
+            <div class="card-body">
+                <p>Transportation accounts for approximately <strong>29% of global greenhouse gas emissions</strong>. Vehicle CO2 emissions are measured in <strong>grams per kilometer (g/km)</strong> and depend on factors like engine size, vehicle weight, fuel type, and fuel consumption.</p>
+                <p>This application predicts the CO2 emissions of a vehicle based on its specifications, helping consumers make environmentally conscious choices when purchasing a vehicle.</p>
+                <h6 class="text-emerald mt-3">Key Emission Factors</h6>
+                <ul class="mb-0">
+                    <li><strong>Regular Gasoline:</strong> 2.31 kg CO2 per litre</li>
+                    <li><strong>Premium Gasoline:</strong> 2.31 kg CO2 per litre</li>
+                    <li><strong>Diesel:</strong> 2.66 kg CO2 per litre</li>
+                    <li><strong>Ethanol (E85):</strong> 1.61 kg CO2 per litre</li>
+                    <li><strong>Hybrid:</strong> ~40% less fuel consumption</li>
+                    <li><strong>Electric:</strong> Zero tailpipe emissions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-star"></i> CO2 Rating System</div>
+            <div class="card-body">
+                <p>Vehicles are rated on a <strong>1–10 scale</strong> based on predicted CO2 emissions:</p>
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th>Rating</th><th>CO2 Range</th><th>Label</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr style="color:#22c55e;"><td>10</td><td>&le; 0 g/km (Electric)</td><td>Excellent</td></tr>
+                        <tr style="color:#22c55e;"><td>8–9</td><td>120–180 g/km</td><td>Excellent</td></tr>
+                        <tr style="color:#84cc16;"><td>6–7</td><td>180–250 g/km</td><td>Good</td></tr>
+                        <tr style="color:#eab308;"><td>4–5</td><td>250–350 g/km</td><td>Moderate</td></tr>
+                        <tr style="color:#ef4444;"><td>1–3</td><td>&gt; 350 g/km</td><td>High</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="bi bi-lightning"></i> What's New in v2</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Vehicle Weight</strong> — Major CO2 factor now included</li>
+                    <li><strong>Model Year</strong> — Newer vehicles emit less</li>
+                    <li><strong>Hybrid & Electric</strong> — Full EV/Hybrid support</li>
+                    <li><strong>Confidence Intervals</strong> — 90% prediction range from Random Forest trees</li>
+                    <li><strong>Smart Validation</strong> — Warns about impossible combos (e.g., 12-cyl compact)</li>
+                    <li><strong>Carbon Footprint Calculator</strong> — Annual emissions + trees to offset</li>
+                    <li><strong>Eco Recommendations</strong> — Actionable tips per prediction</li>
+                    <li><strong>REST API</strong> — <code>POST /api/predict</code> for integration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-cpu"></i> ML Architecture</div>
+            <div class="card-body">
+                <h6 class="text-emerald">Input Features (11)</h6>
+                <div class="mb-3">
+                    <span class="badge bg-secondary me-1 mb-1">Make</span>
+                    <span class="badge bg-secondary me-1 mb-1">Model Year</span>
+                    <span class="badge bg-secondary me-1 mb-1">Vehicle Class</span>
+                    <span class="badge bg-secondary me-1 mb-1">Transmission</span>
+                    <span class="badge bg-secondary me-1 mb-1">Fuel Type</span>
+                    <span class="badge bg-secondary me-1 mb-1">Engine Size</span>
+                    <span class="badge bg-secondary me-1 mb-1">Cylinders</span>
+                    <span class="badge bg-secondary me-1 mb-1">Vehicle Weight</span>
+                    <span class="badge bg-secondary me-1 mb-1">City Fuel</span>
+                    <span class="badge bg-secondary me-1 mb-1">Highway Fuel</span>
+                    <span class="badge bg-secondary me-1 mb-1">Combined Fuel</span>
+                </div>
+
+                <h6 class="text-emerald">6 Algorithms Compared</h6>
+                <ol class="mb-3">
+                    <li>Linear Regression</li>
+                    <li>Random Forest Regressor</li>
+                    <li>Decision Tree Regressor</li>
+                    <li>XGBoost Regressor</li>
+                    <li>AdaBoost Regressor</li>
+                    <li>Lasso Regression</li>
+                </ol>
+
+                <h6 class="text-emerald">Pipeline</h6>
+                <div class="text-muted small">
+                    <p class="mb-1">1. LabelEncoder for categorical features (Make, Class, Transmission, Fuel)</p>
+                    <p class="mb-1">2. StandardScaler for numeric features (7 features)</p>
+                    <p class="mb-1">3. 70-30 train-test split</p>
+                    <p class="mb-1">4. Train 6 regressors, evaluate with R², MAE, RMSE</p>
+                    <p class="mb-1">5. Best model (highest R²) saved for predictions</p>
+                    <p class="mb-0">6. Confidence intervals from individual tree variance</p>
+                </div>
+
+                {% if models_info %}
+                <div class="mt-3 p-2" style="background: rgba(16,185,129,0.1); border-radius: 8px;">
+                    <small class="text-emerald fw-bold">Best Model: {{ models_info['best_model'] }}</small><br>
+                    <small class="text-muted">
+                        R²: {{ models_info['models'][models_info['best_model']]['r2'] }}% |
+                        MAE: {{ models_info['models'][models_info['best_model']]['mae'] }} g/km |
+                        Train: {{ models_info['train_size'] }} | Test: {{ models_info['test_size'] }}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-code-slash"></i> REST API</div>
+            <div class="card-body">
+                <h6 class="text-emerald">POST /api/predict</h6>
+                <p class="text-muted small mb-2">Send vehicle specs as JSON, get prediction with confidence interval and recommendations.</p>
+                <pre style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 0.8rem; font-size: 0.75rem; overflow-x: auto;"><code>{
+  "Make": "Toyota", "Vehicle_Class": "Compact",
+  "Transmission": "CVT", "Fuel_Type": "Hybrid",
+  "Engine_Size": 1.8, "Cylinders": 4,
+  "Vehicle_Weight": 1400, "Model_Year": 2024,
+  "Fuel_Consumption_City": 4.5,
+  "Fuel_Consumption_Hwy": 4.0,
+  "Fuel_Consumption_Comb": 4.3
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="bi bi-gear"></i> Technology Stack</div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4 mb-3">
+                        <i class="bi bi-filetype-py text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">Python / Flask</p>
+                    </div>
+                    <div class="col-4 mb-3">
+                        <i class="bi bi-robot text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">scikit-learn</p>
+                    </div>
+                    <div class="col-4 mb-3">
+                        <i class="bi bi-lightning text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">XGBoost</p>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-table text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">Pandas</p>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-bar-chart text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">Chart.js</p>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-bootstrap text-emerald" style="font-size:2rem;"></i>
+                        <p class="small mb-0 mt-1">Bootstrap 5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
