@@ -1,0 +1,21 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+SQLAlchemy==2.0.32
+pydantic==2.9.0
+typing-extensions==4.12.2
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+# ML pipeline
+scikit-learn>=1.3.0
+joblib>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+# PCAP and live capture
+scapy>=2.5.0
+dpkt>=1.9.8
+# Splunk HEC
+requests>=2.31.0
+# Optional explainability (use tree feature importance if not installed)
+# shap>=0.43.0
