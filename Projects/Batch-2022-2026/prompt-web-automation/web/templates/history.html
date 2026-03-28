@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Task History — AI Web Automation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+    <div class="col-lg-11">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>
+                <i class="bi bi-clock-history text-accent"></i> Task History
+            </h3>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="loadHistory()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">
+                    <i class="bi bi-trash"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover history-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Timestamp</th>
+                                <th>Module</th>
+                                <th>Target URL</th>
+                                <th>Task</th>
+                                <th>Status</th>
+                                <th>Steps</th>
+                                <th>Items</th>
+                                <th>Duration</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr>
+                                <td colspan="10" class="text-center text-secondary py-4">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="summaryCard" class="card mt-3" style="display:none;">
+            <div class="card-body">
+                <h6 class="text-accent mb-2"><i class="bi bi-journal-text"></i> Run Summary</h6>
+                <p id="summaryText" class="mb-0 small"></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadHistory() {
+    fetch('/api/history')
+        .then(r => r.json())
+        .then(data => renderHistory(data))
+        .catch(() => {
+            document.getElementById('historyBody').innerHTML =
+                '<tr><td colspan="10" class="text-center text-danger">Failed to load history</td></tr>';
+        });
+}
+
+function renderHistory(runs) {
+    const tbody = document.getElementById('historyBody');
+
+    if (!runs.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-secondary py-4">No tasks run yet. Try the Scraper or Form Filler.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = runs.map(run => {
+        const time = run.timestamp.substring(0, 16).replace('T', ' ');
+        const moduleIcon = run.module === 'scraper'
+            ? '<span class="badge bg-info-subtle text-info-emphasis"><i class="bi bi-cloud-download"></i> Scraper</span>'
+            : '<span class="badge bg-warning-subtle text-warning-emphasis"><i class="bi bi-pencil-square"></i> Form Filler</span>';
+
+        let statusBadge = '';
+        if (run.status === 'success') statusBadge = '<span class="badge bg-success">Success</span>';
+        else if (run.status === 'failed') statusBadge = '<span class="badge bg-danger">Failed</span>';
+        else statusBadge = '<span class="badge bg-secondary">Stopped</span>';
+
+        const url = run.url.length > 35 ? run.url.substring(0, 35) + '...' : run.url;
+        const task = run.task_description.length > 30 ? run.task_description.substring(0, 30) + '...' : run.task_description;
+        const download = run.download_filename
+            ? `<a href="/scraper/download/${run.download_filename}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i></a>`
+            : '<span class="text-secondary">—</span>';
+
+        return `<tr style="cursor:pointer" onclick="showSummary('${escapeHtml(run.summary || 'No summary')}')">
+            <td class="text-secondary">${run.id}</td>
+            <td class="text-secondary">${time}</td>
+            <td>${moduleIcon}</td>
+            <td class="text-truncate" style="max-width:180px" title="${escapeHtml(run.url)}">${escapeHtml(url)}</td>
+            <td class="text-truncate" style="max-width:150px" title="${escapeHtml(run.task_description)}">${escapeHtml(task)}</td>
+            <td>${statusBadge}</td>
+            <td>${run.steps}</td>
+            <td>${run.items_collected || '—'}</td>
+            <td>${run.duration_seconds}s</td>
+            <td>${download}</td>
+        </tr>`;
+    }).join('');
+}
+
+function showSummary(text) {
+    document.getElementById('summaryText').textContent = text;
+    document.getElementById('summaryCard').style.display = '';
+}
+
+function clearHistory() {
+    if (!confirm('Clear all task history? This cannot be undone.')) return;
+    fetch('/api/history/clear', { method: 'POST' })
+        .then(() => {
+            loadHistory();
+            document.getElementById('summaryCard').style.display = 'none';
+        });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Load on page load
+loadHistory();
+</script>
+{% endblock %}
