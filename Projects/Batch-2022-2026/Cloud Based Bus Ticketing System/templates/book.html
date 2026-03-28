@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+        <h2 class="text-center mb-4">Book Ticket</h2>
+
+        <div class="card p-3 mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>{{ bus.bus_name }}</h5>
+                    <p class="mb-1">{{ bus.bus_number }} | {{ bus.bus_type }}</p>
+                    <p class="mb-1">{{ bus.source }} → {{ bus.destination }}</p>
+                    <p class="mb-0">{{ bus.departure_time }} - {{ bus.arrival_time }}</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h4 class="text-success">Rs. {{ "%.2f"|format(bus.fare) }}</h4>
+                    <p>per seat | {{ bus.available_seats }} available</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Passenger Name</label>
+                    <input type="text" name="passenger_name" class="form-control" required placeholder="Full name as on ID">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Age</label>
+                        <input type="number" name="passenger_age" class="form-control" required min="1" max="120" placeholder="Age">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Gender</label>
+                        <select name="passenger_gender" class="form-select" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Number of Seats</label>
+                        <input type="number" name="seats" class="form-control" required min="1" max="{{ bus.available_seats }}" value="1">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Travel Date</label>
+                        <input type="date" name="travel_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Payment Method</label>
+                    <select name="payment_method" class="form-select" required>
+                        <option value="Online">Online Payment (UPI/Card)</option>
+                        <option value="Net Banking">Net Banking</option>
+                        <option value="Wallet">Digital Wallet</option>
+                        <option value="Cash">Cash on Boarding</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-book w-100 btn-lg">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

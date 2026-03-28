@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <h2 class="text-center mb-4">Search Buses</h2>
+        <div class="card p-4 mb-4">
+            <form method="post" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">From</label>
+                    <select name="source" class="form-select" required>
+                        <option value="">-- Select Source --</option>
+                        {% for s in sources %}
+                        <option value="{{ s }}" {% if s == source %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">To</label>
+                    <select name="destination" class="form-select" required>
+                        <option value="">-- Select Destination --</option>
+                        {% for d in destinations %}
+                        <option value="{{ d }}" {% if d == destination %}selected{% endif %}>{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-book w-100">Search</button>
+                </div>
+            </form>
+        </div>
+
+        {% if buses %}
+        <h5 class="mb-3">{{ buses|length }} bus(es) found:</h5>
+        {% for bus in buses %}
+        <div class="card p-3 mb-3">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h5 class="mb-1">{{ bus.bus_name }}</h5>
+                    <small class="text-muted">{{ bus.bus_number }} | {{ bus.bus_type }}</small>
+                </div>
+                <div class="col-md-2 text-center">
+                    <strong>{{ bus.departure_time }}</strong><br>
+                    <small>{{ bus.source }}</small>
+                </div>
+                <div class="col-md-1 text-center">→</div>
+                <div class="col-md-2 text-center">
+                    <strong>{{ bus.arrival_time }}</strong><br>
+                    <small>{{ bus.destination }}</small>
+                </div>
+                <div class="col-md-2 text-center">
+                    <h5 class="text-success mb-0">Rs. {{ "%.2f"|format(bus.fare) }}</h5>
+                    <small>{{ bus.available_seats }} seats left</small>
+                </div>
+                <div class="col-md-2 text-end">
+                    <a href="/book/{{ bus.id }}" class="btn btn-book">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% elif source %}
+        <div class="text-center mt-4">
+            <p class="lead">No buses found for {{ source }} → {{ destination }}. Try a different route.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
