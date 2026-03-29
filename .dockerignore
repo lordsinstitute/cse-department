@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+.git/
+.DS_Store
+medical_blockchain.db
+static/uploads/
