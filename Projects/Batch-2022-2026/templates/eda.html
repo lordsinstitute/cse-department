@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">{{ title }}</h3>
+            <p class="text-muted mb-0">Click an image to view it in full size</p>
+        </div>
+    </div>
+
+    <!-- Image Grid -->
+    <div class="row g-4">
+        {% for img in images %}
+        <div class="col-md-4">
+            <div class="card eda-card shadow-sm h-100 overflow-hidden rounded-3">
+                <img
+                    src="{{ url_for('static', filename='eda/' + img) }}"
+                    class="img-fluid eda-img"
+                    style="cursor:pointer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#imgModal"
+                    data-img="{{ url_for('static', filename='eda/' + img) }}"
+                    data-title="{{ img }}"
+                >
+                <div class="card-body text-center">
+                    <small class="text-muted">{{ img }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="imgModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-semibold" id="modalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-center p-4">
+                <img id="modalImage" class="img-fluid rounded shadow-sm">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+    const imgModal = document.getElementById('imgModal');
+
+    imgModal.addEventListener('show.bs.modal', function (event) {
+        const img = event.relatedTarget;
+        const imgSrc = img.getAttribute('data-img');
+        const title = img.getAttribute('data-title');
+
+        document.getElementById('modalImage').src = imgSrc;
+        document.getElementById('modalTitle').textContent = title;
+    });
+</script>
+
+<style>
+    .eda-card:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+</style>
+
+{% endblock %}
