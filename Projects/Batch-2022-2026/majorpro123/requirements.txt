@@ -1,0 +1,13 @@
+opencv-python
+scikit-learn
+numpy
+seaborn
+matplotlib
+tensorflow
+albumentations
+tqdm
+natsort
+pillow
+keras
+flask
+werkzeug
