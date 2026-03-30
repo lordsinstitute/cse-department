@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-house-fill text-warning me-2"></i>Dashboard</h3>
+    <a href="{{ url_for('predict') }}" class="btn btn-warning"><i class="bi bi-search me-2"></i>Scan a URL</a>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ user_preds }}</div>
+            <div class="stat-label"><i class="bi bi-search me-1"></i>Your Scans</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value text-danger">{{ user_malicious }}</div>
+            <div class="stat-label"><i class="bi bi-exclamation-triangle me-1"></i>Malicious Detected</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value text-success">{{ user_preds - user_malicious }}</div>
+            <div class="stat-label"><i class="bi bi-check-circle me-1"></i>Safe URLs</div>
+        </div>
+    </div>
+</div>
+
+{% if admin_stats %}
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-gear-fill text-warning me-2"></i>Admin Statistics (All Users)</h6></div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">{{ admin_stats.users }}</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">{{ admin_stats.predictions }}</div>
+                    <div class="stat-label">Total Scans (All Users)</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value text-danger">{{ admin_stats.malicious }}</div>
+                    <div class="stat-label">Total Malicious Detected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Predictions -->
+<div class="card">
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock-history text-warning me-2"></i>Recent Scans</h6></div>
+    <div class="card-body">
+        {% if recent %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead><tr><th>URL</th><th>Result</th><th>Confidence</th><th>Date</th></tr></thead>
+                <tbody>
+                {% for r in recent %}
+                <tr>
+                    <td class="text-truncate" style="max-width: 350px;">{{ r['url'] }}</td>
+                    <td>
+                        {% if r['prediction'] == 'Malicious' %}
+                        <span class="badge badge-danger"><i class="bi bi-exclamation-triangle me-1"></i>Malicious</span>
+                        {% else %}
+                        <span class="badge badge-safe"><i class="bi bi-check-circle me-1"></i>Legitimate</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r['confidence'] }}%</td>
+                    <td class="text-muted small">{{ r['created_at'][:16] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0">No scans yet. <a href="{{ url_for('predict') }}" class="text-warning">Scan your first URL</a></p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-3 mt-3">
+    <div class="col-md-3"><a href="{{ url_for('predict') }}" class="btn btn-outline-warning w-100"><i class="bi bi-search me-2"></i>Detect URL</a></div>
+    <div class="col-md-3"><a href="{{ url_for('history') }}" class="btn btn-outline-light w-100"><i class="bi bi-clock-history me-2"></i>View History</a></div>
+    <div class="col-md-3"><a href="{{ url_for('visualize') }}" class="btn btn-outline-light w-100"><i class="bi bi-bar-chart me-2"></i>Visualize Data</a></div>
+    <div class="col-md-3"><a href="{{ url_for('dashboard') }}" class="btn btn-outline-light w-100"><i class="bi bi-speedometer2 me-2"></i>Model Dashboard</a></div>
+</div>
+{% endblock %}
