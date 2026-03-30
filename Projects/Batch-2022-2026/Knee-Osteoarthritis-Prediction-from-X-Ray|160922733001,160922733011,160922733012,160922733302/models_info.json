@@ -1,0 +1,41 @@
+{
+  "MobileNetV2": {
+    "accuracy": 61.6,
+    "precision": 58.67,
+    "recall": 61.6,
+    "f1": 56.65,
+    "per_class": {
+      "Normal": 90.45,
+      "Doubtful": 6.49,
+      "Mild": 52.73,
+      "Moderate": 65.6,
+      "Severe": 77.05
+    }
+  },
+  "Custom CNN": {
+    "accuracy": 54.54,
+    "precision": 42.5,
+    "recall": 54.54,
+    "f1": 45.93,
+    "per_class": {
+      "Normal": 87.84,
+      "Doubtful": 0.0,
+      "Mild": 31.73,
+      "Moderate": 88.66,
+      "Severe": 0.0
+    }
+  },
+  "Random Forest": {
+    "accuracy": 41.79,
+    "precision": 34.25,
+    "recall": 41.79,
+    "f1": 33.6,
+    "per_class": {
+      "Normal": 83.83,
+      "Doubtful": 2.35,
+      "Mild": 28.91,
+      "Moderate": 6.24,
+      "Severe": 0.82
+    }
+  }
+}
