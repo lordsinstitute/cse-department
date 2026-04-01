@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}About — House Price Prediction{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle text-accent"></i> About This Project</h2>
+
+<div class="row g-4">
+  <div class="col-md-7">
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Project Overview</h4>
+      <p>House Price Prediction is a machine learning-powered web application that estimates California housing prices based on geographic, demographic, and economic features. The system trains multiple regression models and uses the best-performing one (Gradient Boosting) for real-time predictions.</p>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">How It Works</h4>
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-input-cursor text-info" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">1. Input Features</h6>
+            <small class="text-muted">Enter 9 housing characteristics (location, rooms, income, etc.)</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-cpu text-warning" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">2. Feature Processing</h6>
+            <small class="text-muted">Categorical features encoded, numerical features normalized</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-diagram-3 text-accent" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">3. Model Prediction</h6>
+            <small class="text-muted">Gradient Boosting ensemble model predicts the price</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-house-check text-success" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">4. Result</h6>
+            <small class="text-muted">Predicted median house value displayed with input summary</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Input Features</h4>
+      <table class="table table-dark table-sm">
+        <thead><tr><th>Feature</th><th>Description</th><th>Range</th></tr></thead>
+        <tbody>
+          <tr><td>Longitude</td><td>Geographic longitude coordinate</td><td>-124.35 to -114.31</td></tr>
+          <tr><td>Latitude</td><td>Geographic latitude coordinate</td><td>32.54 to 41.95</td></tr>
+          <tr><td>Housing Median Age</td><td>Median age of houses in the area</td><td>1 to 52 years</td></tr>
+          <tr><td>Total Rooms</td><td>Total number of rooms in the area</td><td>1 to 40,000</td></tr>
+          <tr><td>Total Bedrooms</td><td>Total number of bedrooms in the area</td><td>1 to 7,000</td></tr>
+          <tr><td>Population</td><td>Total population in the area</td><td>1 to 35,000</td></tr>
+          <tr><td>Households</td><td>Number of households in the area</td><td>1 to 6,100</td></tr>
+          <tr><td>Median Income</td><td>Median income in tens of thousands ($)</td><td>0.5 to 15.0</td></tr>
+          <tr><td>Ocean Proximity</td><td>Location relative to the ocean</td><td>5 categories</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h4 class="text-accent">ML Models Trained</h4>
+      <ul class="list-unstyled mt-2">
+        <li class="mb-2"><i class="bi bi-check-circle text-accent"></i> <strong>Linear Regression</strong> — Baseline linear model</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-accent"></i> <strong>Ridge Regression</strong> — L2 regularized linear model</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-accent"></i> <strong>Decision Tree</strong> — Non-linear tree-based model</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-accent"></i> <strong>Random Forest</strong> — Ensemble of decision trees</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> <strong>Gradient Boosting</strong> — Sequential ensemble (Best Model)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Tech Stack</h4>
+      <table class="table table-dark table-sm">
+        <tbody>
+          <tr><td><strong>Backend</strong></td><td>Python + Flask</td></tr>
+          <tr><td><strong>Frontend</strong></td><td>Jinja2 + Bootstrap 5</td></tr>
+          <tr><td><strong>Database</strong></td><td>SQLite</td></tr>
+          <tr><td><strong>ML Library</strong></td><td>scikit-learn</td></tr>
+          <tr><td><strong>Data Analysis</strong></td><td>pandas + NumPy</td></tr>
+          <tr><td><strong>Visualization</strong></td><td>matplotlib + seaborn</td></tr>
+          <tr><td><strong>Authentication</strong></td><td>Werkzeug (password hashing)</td></tr>
+          <tr><td><strong>Model Storage</strong></td><td>joblib (pickle)</td></tr>
+          <tr><td><strong>Container</strong></td><td>Docker</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Dataset</h4>
+      <p>Based on the <strong>California Housing Dataset</strong> — a classic ML dataset containing information about housing in California census blocks.</p>
+      <ul class="list-unstyled">
+        <li><i class="bi bi-database text-accent"></i> 10,000 data points</li>
+        <li><i class="bi bi-columns text-accent"></i> 9 input features + 1 target</li>
+        <li><i class="bi bi-geo-alt text-accent"></i> California geographic data</li>
+        <li><i class="bi bi-currency-dollar text-accent"></i> Median house values ($15K - $500K)</li>
+      </ul>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h4 class="text-accent">Security Features</h4>
+      <ul class="list-unstyled">
+        <li><i class="bi bi-lock text-accent"></i> Password hashing (PBKDF2-SHA256)</li>
+        <li><i class="bi bi-shield-lock text-accent"></i> Session-based authentication</li>
+        <li><i class="bi bi-database-lock text-accent"></i> Parameterized SQL queries</li>
+        <li><i class="bi bi-person-check text-accent"></i> Per-user prediction history</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

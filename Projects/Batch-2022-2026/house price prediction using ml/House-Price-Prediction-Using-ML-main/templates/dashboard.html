@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Model Dashboard — House Price Prediction{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-graph-up text-accent"></i> Model Performance Dashboard</h2>
+
+<div class="row g-3 mb-4">
+  {% for name, metrics in models.items() %}
+  <div class="col-md-4 col-sm-6">
+    <div class="card glass-card p-3 {% if name == best_model %}border-success{% endif %}">
+      <div class="d-flex justify-content-between align-items-start">
+        <h6 class="mb-0">{{ name }}</h6>
+        {% if name == best_model %}
+        <span class="badge bg-success">Best</span>
+        {% endif %}
+      </div>
+      <hr class="my-2">
+      <div class="row g-2">
+        <div class="col-6">
+          <small class="text-muted d-block">R² Score</small>
+          <strong class="text-accent">{{ metrics.R2 }}</strong>
+        </div>
+        <div class="col-6">
+          <small class="text-muted d-block">Adjusted R²</small>
+          <strong>{{ metrics.Adj_R2 }}</strong>
+        </div>
+        <div class="col-6">
+          <small class="text-muted d-block">MAE</small>
+          <strong>${{ '{:,.0f}'.format(metrics.MAE) }}</strong>
+        </div>
+        <div class="col-6">
+          <small class="text-muted d-block">RMSE</small>
+          <strong>${{ '{:,.0f}'.format(metrics.RMSE) }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card glass-card p-4">
+  <h5><i class="bi bi-table text-accent"></i> Full Comparison Table</h5>
+  <div class="table-responsive mt-3">
+    <table class="table table-dark table-hover">
+      <thead><tr><th>Model</th><th>R²</th><th>Adj R²</th><th>MAE ($)</th><th>MSE</th><th>RMSE ($)</th></tr></thead>
+      <tbody>
+        {% for name, metrics in models.items() %}
+        <tr class="{% if name == best_model %}table-success{% endif %}">
+          <td>{{ name }} {% if name == best_model %}<span class="badge bg-success">Best</span>{% endif %}</td>
+          <td>{{ metrics.R2 }}</td>
+          <td>{{ metrics.Adj_R2 }}</td>
+          <td>{{ '{:,.0f}'.format(metrics.MAE) }}</td>
+          <td>{{ '{:,.0f}'.format(metrics.MSE) }}</td>
+          <td>{{ '{:,.0f}'.format(metrics.RMSE) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
