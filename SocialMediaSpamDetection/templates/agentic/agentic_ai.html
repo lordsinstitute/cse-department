@@ -1,0 +1,62 @@
+{% extends "base_layout.html" %}
+
+{% block content %}
+
+<h3>Agentic AI Spam Detection</h3>
+
+<form method="post">
+
+<textarea name="tweet"
+class="form-control mb-3"
+placeholder="Enter tweet"></textarea>
+
+<input name="followers"
+class="form-control mb-2"
+placeholder="Followers">
+
+<input name="following"
+class="form-control mb-2"
+placeholder="Following">
+
+<input name="actions"
+class="form-control mb-3"
+placeholder="Actions">
+
+<button class="btn btn-success">
+
+Run Agents
+
+</button>
+
+</form>
+
+
+{% if output %}
+
+<div class="agent-box mt-4">
+
+<h5>Content Agent</h5>
+
+<pre>{{output.content_agent}}</pre>
+
+<h5>Behavior Agent</h5>
+
+<pre>{{output.behavior_agent}}</pre>
+
+<h5>Link Agent</h5>
+
+<pre>{{output.link_agent}}</pre>
+
+<h4 class="text-warning">
+
+Final Decision
+
+</h4>
+
+<pre>{{output.decision}}</pre>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

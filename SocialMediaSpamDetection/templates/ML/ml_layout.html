@@ -1,0 +1,29 @@
+{% extends "base_layout.html" %}
+
+{% block content %}
+
+<div class="row">
+
+<div class="col-md-2 sidebar">
+
+<a href="/ml/eda">EDA</a>
+
+<a href="/ml/compare">Compare Algorithms</a>
+
+<a href="/ml/best">Best Model</a>
+
+<a href="/ml/predict">Prediction</a>
+
+</div>
+
+<div class="col-md-10">
+
+{% block mlcontent %}
+
+{% endblock %}
+
+</div>
+
+</div>
+
+{% endblock %}
