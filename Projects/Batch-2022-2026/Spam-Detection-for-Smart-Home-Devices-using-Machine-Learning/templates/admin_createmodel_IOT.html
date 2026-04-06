@@ -1,0 +1,59 @@
+{% include "header_admin.html" %}
+<div class="container">
+
+    <button onclick="hide_cat()">Click here to create model using Deep Learning</button><br><br>
+        <div class="lds-ripple" id="gear" style="display: none; margin: 150px"><div></div><div></div></div>
+        <div id="AccDisplay1" style="display: none; width:800px; height:50px"></div>
+
+    <button onclick="hide_cnn()">Click here to display model accuracy & model loss</button><br><br>
+        <div class="lds-ripple" id="gear" style="display: none; margin: 150px"><div></div><div></div></div>
+        <div id="AccDisplay2" style="display: none; width:800px; height:450px"></div>
+
+
+
+    <div id="cat" style="display: none">
+    <p style="color: green;font-size: large">Model created successfully</p>
+    <p style="color: maroon;font-size: large">Accuracy of the model is : {{ acc[1]*100 }}%</p>
+    </div>
+
+    <div id="cnn" style="display: none">
+
+        <img src="../static/pimg/macc.jpg"  width="300px" height="300px"> <span>&nbsp;&nbsp;</span><img src="../static/pimg/mloss.jpg"  width="300px" height="300px">
+    </div>
+
+
+</div>
+<div class="footer"></div>
+	</div>
+</body>
+</html>
+
+<script>
+var myVar;
+
+function hide_cat() {
+  document.getElementById("AccDisplay1").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_cat, 3000);
+}
+function show_cat() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay1").style.display = "block";
+document.getElementById('AccDisplay1').innerHTML=document.getElementById('cat').innerHTML;
+}
+
+function hide_cnn() {
+  document.getElementById("AccDisplay2").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_cnn, 3000);
+}
+function show_cnn() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay2").style.display = "block";
+document.getElementById('AccDisplay2').innerHTML=document.getElementById('cnn').innerHTML;
+}
+
+
+</script>
+
+
