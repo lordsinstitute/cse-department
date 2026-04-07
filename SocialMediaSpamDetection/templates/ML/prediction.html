@@ -1,0 +1,55 @@
+{% extends "ml/ml_layout.html" %}
+
+{% block mlcontent %}
+
+<h3>Spam Prediction</h3>
+
+<form method="post">
+
+<textarea name="tweet"
+class="form-control mb-3"
+placeholder="Enter tweet"></textarea>
+
+<input name="followers"
+class="form-control mb-2"
+placeholder="Followers">
+
+<input name="following"
+class="form-control mb-2"
+placeholder="Following">
+
+<input name="actions"
+class="form-control mb-3"
+placeholder="Actions">
+
+<button class="btn btn-primary">Predict</button>
+
+</form>
+
+{% if result %}
+
+<h4 class="mt-4">
+
+Prediction : {{result}}
+
+</h4>
+<h5 class="mt-4">
+
+Confidence : {{confidence}}%
+
+</h5>
+
+<div class="progress">
+
+<div class="progress-bar bg-danger"
+style="width:{{confidence}}%">
+
+{{confidence}}%
+
+</div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
