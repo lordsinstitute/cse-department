@@ -1,0 +1,11 @@
+# Ignore virtual environment
+venv/
+.idea/
+__pycache__/
+*.pyc
+
+# Ignore ML project specific folders
+Projects/Batch-2022-2026/Euro-Dollar Prediction/venv/
+Projects/Batch-2022-2026/Euro-Dollar Prediction/.idea/
+Projects/Batch-2022-2026/Euro-Dollar Prediction/uploads/
+Projects/Batch-2022-2026/Euro-Dollar Prediction/train/

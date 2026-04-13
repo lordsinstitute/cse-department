@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Upload Dataset</h2>
+            <p class="text-muted mb-0">Import your CSV files to train and test AI models</p>
+        </div>
+    </div>
+
+    <!-- Alert Message -->
+    {% if message %}
+        <div class="alert alert-{{ 'success' if status == 'success' else 'danger' }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+
+    <!-- Upload Card -->
+    <div class="card upload-card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <form method="POST" enctype="multipart/form-data">
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Select CSV Dataset</label>
+                    <input type="file" class="form-control form-control-lg" name="dataset" required>
+                    <small class="text-muted">Accepted format: .csv | Max size: 10MB</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                    Upload Dataset
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
