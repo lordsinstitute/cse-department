@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-house"></i> Welcome, {{ session.get('name', 'User') }}</h2>
+
+<!-- Ensemble Model Status Banner -->
+{% if active_models %}
+<div class="mb-4 p-3" style="background:rgba(20,184,166,0.08); border:1px solid rgba(20,184,166,0.2); border-radius:10px;">
+    <small class="text-teal fw-semibold"><i class="bi bi-layers"></i> Active Ensemble Models:</small>
+    {% for m in active_models %}
+    <span class="badge ms-2" style="background:rgba(20,184,166,0.2); color:#14b8a6; border:1px solid rgba(20,184,166,0.3);">{{ m }}</span>
+    {% endfor %}
+    {% if active_models|length < 3 %}
+    <small class="text-muted ms-2">— run <code>train_model.py</code> to activate all 3</small>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="stat-card">
+            <h3>{{ total_scans }}</h3>
+            <p><i class="bi bi-image"></i> Total Scans</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <h3 style="color:#14b8a6;">{{ total_patients }}</h3>
+            <p><i class="bi bi-people"></i> Patients</p>
+        </div>
+    </div>
+    {% for grade, count in grade_counts.items() %}
+    <div class="col-md-2">
+        <div class="stat-card">
+            <h3 style="color: {{ grade_colors[grade] }}">{{ count }}</h3>
+            <p><i class="bi bi-circle-fill" style="color: {{ grade_colors[grade] }}; font-size: 0.6rem;"></i> {{ grade }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if admin_stats %}
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-shield-check"></i> Admin Statistics</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <h3>{{ admin_stats.total_users }}</h3>
+                    <p><i class="bi bi-people"></i> Total Users</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <h3>{{ admin_stats.total_scans }}</h3>
+                    <p><i class="bi bi-images"></i> All Scans</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-lightning"></i> Quick Actions</div>
+            <div class="card-body">
+                <a href="{{ url_for('predict') }}" class="btn btn-scan w-100 mb-3">
+                    <i class="bi bi-upload"></i> Upload X-Ray for Analysis
+                </a>
+                <a href="{{ url_for('history') }}" class="btn btn-outline-teal w-100 mb-3">
+                    <i class="bi bi-clock-history"></i> View Scan History
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-teal w-100">
+                    <i class="bi bi-speedometer2"></i> View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><i class="bi bi-download"></i> Sample Test Images</div>
+            <div class="card-body">
+                <p class="text-muted small">Download sample X-ray images to test (2 per grade):</p>
+                {% if samples %}
+                <div class="row g-2">
+                    {% for sample in samples %}
+                    <div class="col-6">
+                        {% set grade_name = sample.split('_')[2] %}
+                        <a href="{{ url_for('download_sample', filename=sample) }}"
+                           class="btn btn-sm btn-outline-secondary w-100" style="font-size: 0.75rem;">
+                            <i class="bi bi-download"></i> {{ sample }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No sample images. Run generate_dataset.py first.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recent %}
+<div class="card mt-4">
+    <div class="card-header"><i class="bi bi-clock"></i> Recent Scans</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Image</th><th>Grade</th><th>Confidence</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    {% for scan in recent %}
+                    <tr>
+                        <td><img src="/{{ scan['image_path'] }}" alt="X-Ray" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;"></td>
+                        <td><span class="badge badge-{{ scan['prediction']|lower }}">{{ scan['prediction'] }} (Grade {{ ['Normal','Doubtful','Mild','Moderate','Severe'].index(scan['prediction']) }})</span></td>
+                        <td>{{ scan['confidence'] }}%</td>
+                        <td>{{ scan['scan_date'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

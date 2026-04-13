@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Predict{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-area {
+        border: 2px dashed rgba(20, 184, 166, 0.4);
+        border-radius: 12px; padding: 2rem; text-align: center;
+        cursor: pointer; transition: all 0.3s;
+        background: rgba(20, 184, 166, 0.05);
+    }
+    .upload-area:hover, .upload-area.dragover {
+        border-color: #14b8a6; background: rgba(20, 184, 166, 0.1);
+    }
+    .upload-area i { font-size: 3rem; color: #14b8a6; }
+    .preview-img {
+        max-width: 100%; max-height: 250px; border-radius: 10px;
+        border: 2px solid rgba(255,255,255,0.1);
+    }
+    .conf-bar-bg {
+        height: 24px; background: rgba(255,255,255,0.08); border-radius: 6px;
+        overflow: hidden; position: relative;
+    }
+    .conf-bar-fill {
+        height: 100%; border-radius: 6px; transition: width 1s ease;
+        display: flex; align-items: center; padding-left: 8px;
+        font-size: 0.75rem; font-weight: 600; color: white;
+    }
+    .conf-label { font-size: 0.85rem; margin-bottom: 2px; }
+    .xray-comparison {
+        display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    }
+    .xray-comparison .xray-item {
+        text-align: center; flex: 1; min-width: 140px; max-width: 200px;
+    }
+    .xray-comparison .xray-item img {
+        width: 100%; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1);
+    }
+    .xray-comparison .xray-item p { font-size: 0.8rem; margin-top: 6px; color: #94a3b8; }
+    .explanation-card {
+        background: rgba(255,255,255,0.03);
+        border-radius: 10px; padding: 1.2rem; border-left: 3px solid;
+    }
+    .explanation-card .finding-item {
+        padding: 6px 0; font-size: 0.9rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        display: flex; align-items: flex-start; gap: 8px;
+    }
+    .explanation-card .finding-item:last-child { border-bottom: none; }
+    .explanation-card .finding-icon { color: #14b8a6; margin-top: 2px; flex-shrink: 0; }
+    .gradcam-label {
+        font-size: 0.7rem; padding: 2px 8px; border-radius: 4px;
+        display: inline-block; margin-bottom: 6px;
+    }
+    .ensemble-badge {
+        background: rgba(20, 184, 166, 0.15);
+        border: 1px solid rgba(20, 184, 166, 0.3);
+        border-radius: 6px; padding: 4px 10px;
+        font-size: 0.78rem; color: #14b8a6;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-upload"></i> Upload Knee X-Ray</h2>
+<p class="text-muted mb-4">Upload a knee X-ray image for AI-powered osteoarthritis severity grading using Ensemble Learning (MobileNetV2 + Custom CNN + Random Forest).</p>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cloud-upload"></i> Select Image</div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-area mb-3" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <i class="bi bi-cloud-arrow-up d-block mb-2"></i>
+                        <p class="mb-1">Drag & drop or click to upload</p>
+                        <small class="text-muted">Supported: PNG, JPG, BMP, TIFF</small>
+                        <div id="filePreview" class="mt-3" style="display:none;">
+                            <img id="previewImg" class="preview-img" alt="Preview">
+                            <p id="fileName" class="mt-2 mb-0 text-muted"></p>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" name="xray_image" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" style="display:none" required>
+
+                    {% if patients %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted" style="font-size:0.85rem;">
+                            <i class="bi bi-person-plus"></i> Assign to Patient (optional)
+                        </label>
+                        <select name="patient_id" class="form-select">
+                            <option value="">— No patient —</option>
+                            {% for p in patients %}
+                            <option value="{{ p['id'] }}">{{ p['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            <a href="{{ url_for('new_patient') }}">Add a patient</a> to track progression.
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-scan w-100" id="submitBtn" disabled>
+                        <i class="bi bi-cpu"></i> Classify with Ensemble
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><i class="bi bi-list-ol"></i> KL Grading Scale</div>
+            <div class="card-body">
+                <div class="mb-2"><span class="badge badge-normal">Grade 0</span> Normal — No signs</div>
+                <div class="mb-2"><span class="badge badge-doubtful">Grade 1</span> Doubtful — Possible narrowing</div>
+                <div class="mb-2"><span class="badge badge-mild">Grade 2</span> Mild — Definite osteophytes</div>
+                <div class="mb-2"><span class="badge badge-moderate">Grade 3</span> Moderate — Significant narrowing</div>
+                <div><span class="badge badge-severe">Grade 4</span> Severe — Large osteophytes, deformity</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if result %}
+        <div class="card" style="border-left: 4px solid {{ result.grade_color }};">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="bi bi-clipboard2-pulse"></i> Classification Result</span>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <span class="badge" style="background: {{ result.grade_color }};">
+                        {{ result.prediction }} (Grade {{ class_names.index(result.prediction) }})
+                    </span>
+                    <a href="{{ url_for('download_report', pred_id=result.id) }}"
+                       class="btn btn-sm btn-outline-teal">
+                        <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Ensemble badge -->
+                <div class="mb-3">
+                    <span class="ensemble-badge">
+                        <i class="bi bi-layers"></i>
+                        Ensemble: {{ result.models_used }}
+                    </span>
+                </div>
+
+                <!-- X-Ray & Grad-CAM Side by Side -->
+                <div class="xray-comparison mb-4">
+                    <div class="xray-item">
+                        <span class="gradcam-label" style="background: rgba(255,255,255,0.1);">Original X-Ray</span>
+                        <img src="/{{ result.image_path }}" alt="X-Ray">
+                    </div>
+                    {% if result.gradcam_path %}
+                    <div class="xray-item">
+                        <span class="gradcam-label" style="background: rgba(239,68,68,0.2); color: #ef4444;">Grad-CAM Heatmap</span>
+                        <img src="/{{ result.gradcam_path }}" alt="Grad-CAM">
+                        <p>Red/yellow regions = areas the model focused on for prediction</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Prediction & Confidence -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5 style="color: {{ result.grade_color }};">
+                            <i class="bi bi-activity"></i>
+                            {{ result.prediction }} (Grade {{ class_names.index(result.prediction) }})
+                            — {{ result.confidence }}% Confidence
+                        </h5>
+
+                        {% if result.explanation %}
+                        <div class="explanation-card mt-3 mb-3" style="border-left-color: {{ result.grade_color }};">
+                            <h6 class="mb-2" style="color: {{ result.grade_color }};">
+                                <i class="bi bi-journal-medical"></i> Clinical Findings & Reasoning
+                            </h6>
+                            <p class="text-muted mb-3" style="font-size: 0.9rem;">
+                                {{ result.explanation.description }}
+                            </p>
+                            {% for finding in result.explanation.findings %}
+                            <div class="finding-item">
+                                <i class="bi bi-check-circle-fill finding-icon"></i>
+                                <span>{{ finding }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <h6 class="text-teal mb-2"><i class="bi bi-bar-chart"></i> All Class Probabilities</h6>
+                        {% for cls in class_names %}
+                        <div class="mb-2">
+                            <div class="conf-label d-flex justify-content-between">
+                                <span>{{ cls }} (G{{ loop.index0 }})</span>
+                                <span>{{ result.all_confidences[cls] }}%</span>
+                            </div>
+                            <div class="conf-bar-bg">
+                                <div class="conf-bar-fill" style="width: {{ result.all_confidences[cls] }}%; background: {{ grade_colors[cls] }};"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <small class="text-muted">Scan: {{ result.scan_date }}</small>
+                            {% if result.patient_id %}
+                            <a href="{{ url_for('patient_detail', patient_id=result.patient_id) }}" class="btn btn-sm btn-outline-teal">
+                                <i class="bi bi-person-lines-fill"></i> View Patient Timeline
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-header"><i class="bi bi-clipboard2-pulse"></i> Classification Result</div>
+            <div class="card-body text-center py-5">
+                <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                <p class="text-muted mt-3">Upload a knee X-ray to see the classification result.</p>
+                <small class="text-muted">Ensemble of MobileNetV2 + Custom CNN + Random Forest with Grad-CAM explainability</small>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const filePreview = document.getElementById('filePreview');
+    const previewImg = document.getElementById('previewImg');
+    const fileName = document.getElementById('fileName');
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileName.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = e => { previewImg.src = e.target.result; filePreview.style.display = 'block'; };
+            reader.readAsDataURL(file);
+            submitBtn.disabled = false;
+        }
+    });
+
+    ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); }));
+    dropZone.addEventListener('drop', e => { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); });
+</script>
+{% endblock %}
