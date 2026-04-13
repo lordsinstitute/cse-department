@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Manage Buses</h2>
+    <a href="/admin/add-bus" class="btn btn-book">+ Add Bus</a>
+</div>
+<table class="table table-dark table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Bus Number</th>
+            <th>Bus Name</th>
+            <th>Type</th>
+            <th>Route</th>
+            <th>Time</th>
+            <th>Total Seats</th>
+            <th>Available</th>
+            <th>Fare</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bus in buses %}
+        <tr>
+            <td>{{ bus.id }}</td>
+            <td>{{ bus.bus_number }}</td>
+            <td>{{ bus.bus_name }}</td>
+            <td>{{ bus.bus_type }}</td>
+            <td>{{ bus.source }} → {{ bus.destination }}</td>
+            <td>{{ bus.departure_time }} - {{ bus.arrival_time }}</td>
+            <td>{{ bus.total_seats }}</td>
+            <td>{{ bus.available_seats }}</td>
+            <td>Rs. {{ "%.2f"|format(bus.fare) }}</td>
+            <td><span class="badge bg-{{ 'success' if bus.status == 'Active' else 'secondary' }}">{{ bus.status }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

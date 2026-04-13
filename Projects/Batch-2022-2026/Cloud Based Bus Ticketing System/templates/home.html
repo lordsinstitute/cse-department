@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if session.get('role') == 'admin' %}
+<!-- ===== ADMIN HOME ===== -->
+<div class="mt-3">
+    <h2 class="fw-bold mb-1">Welcome back, {{ session.get('name') }}</h2>
+    <p class="text-muted">Admin Control Panel</p>
+
+    <div class="row mb-4 mt-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <h2>{{ stats.total_buses }}</h2>
+                <p>Active Buses</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <h2>{{ stats.total_bookings }}</h2>
+                <p>Confirmed Bookings</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <h2>{{ stats.total_users }}</h2>
+                <p>Registered Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <h2>Rs. {{ "%.0f"|format(stats.total_revenue) }}</h2>
+                <p>Total Revenue</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.total_routes }}</h2>
+                <p>Destinations Covered</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.total_seats }}</h2>
+                <p>Seats Available</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.cancelled }}</h2>
+                <p>Cancelled Bookings</p>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="text-info mb-3">Quick Actions</h5>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <a href="/admin" class="card p-3 text-center text-decoration-none text-white d-block">
+                <h4 class="mb-1" style="color:#e63946;">Dashboard</h4>
+                <small>View detailed analytics</small>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="/admin/buses" class="card p-3 text-center text-decoration-none text-white d-block">
+                <h4 class="mb-1" style="color:#e63946;">Manage Buses</h4>
+                <small>View and edit fleet</small>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="/admin/add-bus" class="card p-3 text-center text-decoration-none text-white d-block">
+                <h4 class="mb-1" style="color:#e63946;">Add Bus</h4>
+                <small>Add a new route</small>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="/admin/bookings" class="card p-3 text-center text-decoration-none text-white d-block">
+                <h4 class="mb-1" style="color:#e63946;">All Bookings</h4>
+                <small>View customer bookings</small>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% elif session.get('user_id') %}
+<!-- ===== LOGGED-IN USER HOME ===== -->
+<div class="mt-3">
+    <h2 class="fw-bold mb-1">Welcome, {{ session.get('name') }}</h2>
+    <p class="text-muted">Where would you like to travel today?</p>
+
+    <div class="row mb-4 mt-4">
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.my_bookings }}</h2>
+                <p>My Active Bookings</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.total_buses }}</h2>
+                <p>Buses Available</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <h2>{{ stats.total_routes }}</h2>
+                <p>Destinations</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <a href="/search" class="card p-4 text-center text-decoration-none text-white d-block">
+                <h3 class="mb-2" style="color:#e63946;">Search & Book Buses</h3>
+                <p class="mb-0">Find the best routes and book your tickets instantly</p>
+            </a>
+        </div>
+        <div class="col-md-6 mb-3">
+            <a href="/my-bookings" class="card p-4 text-center text-decoration-none text-white d-block">
+                <h3 class="mb-2" style="color:#e63946;">My Bookings</h3>
+                <p class="mb-0">View, manage, or cancel your existing reservations</p>
+            </a>
+        </div>
+    </div>
+
+    {% if user_bookings %}
+    <h5 class="text-info mb-3">Your Recent Bookings</h5>
+    {% for b in user_bookings %}
+    <div class="card p-3 mb-2">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <strong>{{ b.bus_name }}</strong><br>
+                <small>{{ b.source }} → {{ b.destination }}</small>
+            </div>
+            <div class="col-md-3">
+                <small>Passenger:</small> {{ b.passenger_name }}<br>
+                <small>Seats:</small> {{ b.seats }}
+            </div>
+            <div class="col-md-2 text-center">
+                <strong>{{ b.departure_time }}</strong><br>
+                <small>{{ b.travel_date }}</small>
+            </div>
+            <div class="col-md-3 text-end">
+                <h5 class="text-success mb-0">Rs. {{ "%.2f"|format(b.total_fare) }}</h5>
+                <span class="badge bg-success">Confirmed</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="card p-4 mt-4">
+        <h5 class="text-info">Popular Routes from Hyderabad</h5>
+        <div class="row mt-3">
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Bangalore</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Chennai</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Mumbai</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Goa</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Pune</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Tirupati</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Vijayawada</small></div></div>
+            <div class="col-md-3 mb-2"><div class="card p-2 text-center"><small>Hyderabad → Delhi</small></div></div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- ===== GUEST HOME (NOT LOGGED IN) ===== -->
+<div class="text-center mt-4">
+    <h1 class="display-4 fw-bold mb-3">Cloud-Based Bus Ticketing System</h1>
+    <h4 class="text-info mb-4">Comprehensive Reservation & Payment Platform</h4>
+    <p class="lead mb-4">
+        Book bus tickets online with ease. Search routes, compare fares, reserve seats,
+        and manage your bookings — all in one platform.
+    </p>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-3">
+            <div class="card stat-card mb-3">
+                <h2>{{ stats.total_buses }}+</h2>
+                <p>Active Buses</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card mb-3">
+                <h2>{{ stats.total_seats }}+</h2>
+                <p>Seats Available</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card mb-3">
+                <h2>{{ stats.total_routes }}+</h2>
+                <p>Destinations</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 mb-5">
+        <a href="/register" class="btn btn-book btn-lg me-2">Get Started</a>
+        <a href="/login" class="btn btn-outline-light btn-lg">Login</a>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h4 class="text-info mb-3">Why Choose BusBook?</h4>
+                <div class="row text-start">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><strong style="color:#e63946;">Instant Booking</strong><br><small>Book tickets in seconds with just a few clicks</small></li>
+                            <li class="mb-2"><strong style="color:#e63946;">Multiple Payment Options</strong><br><small>UPI, Net Banking, Digital Wallet, or Cash</small></li>
+                            <li class="mb-2"><strong style="color:#e63946;">Real-time Availability</strong><br><small>Live seat count updated after every booking</small></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><strong style="color:#e63946;">Easy Cancellation</strong><br><small>Cancel anytime with instant refund processing</small></li>
+                            <li class="mb-2"><strong style="color:#e63946;">Wide Route Network</strong><br><small>{{ stats.total_routes }}+ destinations across the country</small></li>
+                            <li class="mb-2"><strong style="color:#e63946;">Secure Platform</strong><br><small>Your data and payments are safe with us</small></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h4 class="text-info mb-3">How It Works</h4>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">1</h1>
+                        <strong>Register</strong>
+                        <p><small>Create your free account</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">2</h1>
+                        <strong>Search</strong>
+                        <p><small>Find buses on your route</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">3</h1>
+                        <strong>Book</strong>
+                        <p><small>Select seats and pay online</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">4</h1>
+                        <strong>Travel</strong>
+                        <p><small>Board the bus and enjoy</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
