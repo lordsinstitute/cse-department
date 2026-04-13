@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% block title %}About — EmotionAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-info-circle me-2" style="color: var(--violet);"></i>About the Project</h2>
+    <p>Facial Emotion Recognition Using Deep Learning</p>
+</div>
+
+<!-- Project Overview -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-brain me-2"></i>Project Overview
+    </div>
+    <div class="card-body">
+        <p>
+            This project implements a <strong>Facial Emotion Recognition System</strong> using a Convolutional Neural Network (CNN)
+            built with PyTorch. The system can detect and classify 7 different human emotions from facial images in real-time.
+        </p>
+        <p>
+            The deep learning model analyzes facial features such as eyebrow position, eye shape, and mouth curvature
+            to determine the expressed emotion. A face detection step using OpenCV's Haar Cascade ensures that only
+            face regions are processed for accurate predictions.
+        </p>
+    </div>
+</div>
+
+<!-- 7 Emotions -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-face-smile me-2"></i>7 Recognized Emotions
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Emotion</th>
+                        <th>Visual Cues</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-smile me-2" style="color: #22c55e; font-size: 1.3rem;"></i>
+                            <strong style="color: #22c55e;">Happy</strong>
+                        </td>
+                        <td>Raised eyebrows, wide eyes, upward mouth curve</td>
+                        <td>Expression of joy, pleasure, or contentment</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-sad-tear me-2" style="color: #3b82f6; font-size: 1.3rem;"></i>
+                            <strong style="color: #3b82f6;">Sad</strong>
+                        </td>
+                        <td>Lowered eyebrows, smaller eyes, downward mouth curve</td>
+                        <td>Expression of sorrow, grief, or unhappiness</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-angry me-2" style="color: #ef4444; font-size: 1.3rem;"></i>
+                            <strong style="color: #ef4444;">Angry</strong>
+                        </td>
+                        <td>V-shaped eyebrows, narrow eyes, tight straight mouth</td>
+                        <td>Expression of displeasure, hostility, or frustration</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-surprise me-2" style="color: #f59e0b; font-size: 1.3rem;"></i>
+                            <strong style="color: #f59e0b;">Surprise</strong>
+                        </td>
+                        <td>High eyebrows, very wide circular eyes, O-shaped mouth</td>
+                        <td>Expression of shock or unexpected reaction</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-flushed me-2" style="color: #8b5cf6; font-size: 1.3rem;"></i>
+                            <strong style="color: #8b5cf6;">Fear</strong>
+                        </td>
+                        <td>Raised eyebrows, wide eyes, slightly open mouth</td>
+                        <td>Expression of anxiety, apprehension, or dread</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-grimace me-2" style="color: #84cc16; font-size: 1.3rem;"></i>
+                            <strong style="color: #84cc16;">Disgust</strong>
+                        </td>
+                        <td>Lowered uneven eyebrows, squinted eyes, wavy mouth</td>
+                        <td>Expression of revulsion or strong disapproval</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fas fa-face-meh me-2" style="color: #6b7280; font-size: 1.3rem;"></i>
+                            <strong style="color: #6b7280;">Neutral</strong>
+                        </td>
+                        <td>Normal eyebrows, normal eyes, straight mouth</td>
+                        <td>Relaxed expression with no strong emotion</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-gears me-2"></i>How It Works
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3 col-6 text-center">
+                <div class="p-3" style="background: var(--bg-dark); border-radius: 12px;">
+                    <i class="fas fa-upload fa-2x mb-2" style="color: var(--violet);"></i>
+                    <h6>1. Upload</h6>
+                    <small class="text-secondary">Upload a face image (JPG/PNG)</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="p-3" style="background: var(--bg-dark); border-radius: 12px;">
+                    <i class="fas fa-crop-simple fa-2x mb-2" style="color: var(--violet);"></i>
+                    <h6>2. Detect Face</h6>
+                    <small class="text-secondary">Haar Cascade locates the face</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="p-3" style="background: var(--bg-dark); border-radius: 12px;">
+                    <i class="fas fa-brain fa-2x mb-2" style="color: var(--violet);"></i>
+                    <h6>3. CNN Analysis</h6>
+                    <small class="text-secondary">4-layer CNN classifies the emotion</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="p-3" style="background: var(--bg-dark); border-radius: 12px;">
+                    <i class="fas fa-chart-bar fa-2x mb-2" style="color: var(--violet);"></i>
+                    <h6>4. Result</h6>
+                    <small class="text-secondary">Emotion + confidence displayed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CNN Architecture -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-network-wired me-2"></i>CNN Architecture
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Configuration</th>
+                        <th>Output Shape</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Input</td><td>Grayscale Image</td><td>1 x 48 x 48</td></tr>
+                    <tr><td>Conv Block 1</td><td>Conv2d(1→32, k=3) + BatchNorm + ReLU + MaxPool(2)</td><td>32 x 24 x 24</td></tr>
+                    <tr><td>Conv Block 2</td><td>Conv2d(32→64, k=3) + BatchNorm + ReLU + MaxPool(2)</td><td>64 x 12 x 12</td></tr>
+                    <tr><td>Conv Block 3</td><td>Conv2d(64→128, k=3) + BatchNorm + ReLU + MaxPool(2)</td><td>128 x 6 x 6</td></tr>
+                    <tr><td>Conv Block 4</td><td>Conv2d(128→256, k=3) + BatchNorm + ReLU + MaxPool(2)</td><td>256 x 3 x 3</td></tr>
+                    <tr><td>Flatten</td><td>256 x 3 x 3 = 2304</td><td>2304</td></tr>
+                    <tr><td>FC Layer 1</td><td>Linear(2304→512) + ReLU + Dropout(0.5)</td><td>512</td></tr>
+                    <tr><td>FC Layer 2</td><td>Linear(512→256) + ReLU + Dropout(0.3)</td><td>256</td></tr>
+                    <tr><td>Output</td><td>Linear(256→7) + Softmax</td><td>7</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Tech Stack -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-code me-2"></i>Technology Stack
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% set techs = [
+                        ('Python 3', 'fab fa-python', '#3776ab'),
+                        ('Flask', 'fas fa-pepper-hot', '#22c55e'),
+                        ('PyTorch', 'fas fa-fire', '#ee4c2c'),
+                        ('OpenCV', 'fas fa-eye', '#5c3ee8'),
+                        ('scikit-learn', 'fas fa-robot', '#f7931e'),
+                        ('Bootstrap 5', 'fab fa-bootstrap', '#7952b3'),
+                        ('SQLite', 'fas fa-database', '#003b57'),
+                        ('Matplotlib', 'fas fa-chart-line', '#11557c')
+                    ] %}
+                    {% for name, icon, color in techs %}
+                    <div class="col-6">
+                        <div class="p-2 rounded" style="background: var(--bg-dark);">
+                            <i class="{{ icon }} me-2" style="color: {{ color }};"></i>
+                            <small>{{ name }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-star me-2"></i>Key Features
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% set features = [
+                        'Real-time facial emotion detection from uploaded images',
+                        'Deep learning CNN model with 4 convolutional layers',
+                        'Haar Cascade face detection for robust face localization',
+                        'User authentication with secure password hashing',
+                        'Prediction history tracking per user',
+                        'Model performance dashboard with training charts',
+                        'Comparison with ML baselines (RF, SVM, LR)',
+                        'Responsive dark-themed UI with Bootstrap 5'
+                    ] %}
+                    {% for feature in features %}
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle me-2" style="color: var(--violet);"></i>
+                        {{ feature }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sample Images -->
+{% if samples %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-images me-2"></i>Sample Test Images
+    </div>
+    <div class="card-body">
+        <p class="text-secondary mb-3">Download sample face images to test the emotion detection system:</p>
+        <div class="row g-3">
+            {% for sample in samples %}
+            <div class="col-md-3 col-4">
+                <div class="text-center p-3" style="background: var(--bg-dark); border-radius: 12px;">
+                    <img src="{{ url_for('static', filename='../Dataset/samples/' + sample) }}"
+                         class="img-fluid rounded mb-2" alt="{{ sample }}" style="max-height: 80px;">
+                    <br>
+                    <small class="text-secondary">{{ sample.replace('_', ' ').replace('.png', '') }}</small>
+                    <br>
+                    <a href="{{ url_for('download_sample', filename=sample) }}" class="btn btn-outline-violet btn-sm mt-1">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
