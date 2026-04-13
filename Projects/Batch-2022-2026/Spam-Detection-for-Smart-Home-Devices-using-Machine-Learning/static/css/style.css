@@ -1,0 +1,162 @@
+*{
+	margin:0;
+    box-sizing:border-box;
+
+}
+a{
+  text-decoration:none;
+}
+body{
+  	font-family: Tahoma;
+	background:#385D8A url(../img/iotbg.png) top;
+	}
+.wrap{
+	width:1140px;
+	margin:auto;
+}
+.header{
+	height:155px;
+	font-size:36px;
+	font-weight:bold;+-
+	line-height:1.2em;
+	text-transform:none;
+	text-align:center;
+	vertical-align: center;
+	background:transparent; /*url(../img/loan4.jpg) repeat-x left top;*/
+	color: teal;
+	border-radius: 8px;
+	box-sizing: border-box;
+	margin: 5px;
+}
+.nav{
+	height:50px;
+	background:#76BDD9;
+    padding:5px;
+	border-radius: 8px;
+	box-sizing: border-box;
+	margin: 5px;
+	width: 1140px;
+
+}
+
+.nav ul{
+  list-style:none;
+  padding:0;
+  display:flex;
+	justify-content: right;
+}
+.nav ul li{
+  margin:0px 5px;
+}
+.nav ul li a{
+  color:#000;
+  display:block;
+  padding:8px 12px;
+	font-weight:bold;+-
+
+}
+.nav ul li:hover a{
+  background:navy;
+  color:#fff;
+	font-weight:bold;+-
+}
+.container{
+
+    width:1140px;
+    margin:auto;
+	height: 600px;
+	border-radius: 8px;
+	box-sizing: border-box;
+	opacity: 0.9;
+	background: ghostwhite;
+
+}
+.left{
+	width:30%;
+	height:auto;
+	float:left;
+	background:#cc3e28;
+	border-radius: 8px;
+	box-sizing: border-box;
+
+}
+.right{
+	width:70%;
+	height:auto;
+	float:left;
+	border-radius: 8px;
+	box-sizing: border-box;
+
+
+}
+.clear{
+	clear:both;
+}
+.footer{
+	height:30px;
+	background:transparent;
+
+}
+
+.content
+{
+
+	height: auto;
+	width: 1140px;
+	min-height: 600px;
+	background: ghostwhite;
+	border-radius: 8px;
+	box-sizing: border-box;
+	padding: 10px;
+
+
+}
+
+.msg{
+	color:red;
+	font-weight:bold;
+}
+
+/**** Side Menu ****/
+#menu{
+    padding:20px;
+    margin: 10px;
+}
+
+#menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #f1f1f1;
+  border: 1px solid #555;
+
+
+}
+
+#menu li  {
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+#menu li {
+  text-align: center;
+  border-bottom: 1px solid #555;
+}
+
+#menu li:last-child {
+  border-bottom: none;
+}
+
+#menu li  {
+  background-color: #76BDD9;
+  color: #000;
+}
+
+#menu li:hover {
+  background-color: #555;
+  color: white;
+}
+/**** end side menu*/

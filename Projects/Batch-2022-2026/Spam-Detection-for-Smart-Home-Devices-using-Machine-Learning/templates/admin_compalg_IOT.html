@@ -1,0 +1,144 @@
+{% include "header_admin.html" %}
+<div class="container">
+    <form action="http://localhost:5000/comp_alg" method="post">
+    <table> <tr><td style="vertical-align: top">
+   <div id="menu">
+  <ul>
+    <li onclick="hide_lr()">Bagging Classifier</li>
+    <li onclick="hide_dt()">Gaussian Naive Bayes Classifier </li>
+    <li onclick="hide_rf()">AdaBoost Classifier</li>
+    <li onclick="hide_sv()">Voting Classifier</li>
+    <li onclick="hide_nb()">DecisionTree Classifier</li>
+    <li onclick="hide_ca()">Compare Algorithms</li>
+
+  </ul>
+</div></td>
+
+
+        <td>
+
+<div class="lds-ripple" id="gear" style="display: none; margin: 150px"><div></div><div></div></div>
+<div id="AccDisplay"></div>
+     </td>
+</tr>
+</table>
+<div id="LR" style="display: none">
+        <img src="../static/pimg/bag.jpg"  width="400px" height="400px"><br>
+    <p style="color:navy; font-size: medium"> Accuracy for Bagging Classifer : {{accuracy[0]}}</p>
+    <p style="color:navy; font-size: medium"> Precision for Bagging Classifer : {{precision[0]}}</p>
+    <p style="color:navy; font-size: medium"> Recall for Bagging Classifer : {{recall[0]}}</p>
+    <p style="color:navy; font-size: medium"> F1-Score for Bagging Classifer : {{fscore[0]}}</p>
+        </div>
+
+        <div id="DT" style="display: none">
+           <img src="../static/pimg/gnb.jpg"  width="400px" height="400px">
+    <br>
+    <p style="color:navy; font-size: medium"> Accuracy for Gaussian Naive Bayes Classifer : {{accuracy[1]}}</p>
+    <p style="color:navy; font-size: medium"> Precision for Gaussian Naive Bayes Classifer : {{precision[1]}}</p>
+    <p style="color:navy; font-size: medium"> Recall for Gaussian Naive Bayes Classifer : {{recall[1]}}</p>
+    <p style="color:navy; font-size: medium"> F1-Score for Gaussian Naive Bayes Classifer : {{fscore[1]}}</p>
+        </div>
+    <div id="RF" style="display: none" >
+<img src="../static/pimg/ab.jpg"  width="400px" height="400px">
+    <br>
+    <p style="color:navy; font-size: medium"> Accuracy for AdaBoost Classifer : {{accuracy[2]}}</p>
+    <p style="color:navy; font-size: medium"> Precision for AdaBoost Classifer : {{precision[2]}}</p>
+    <p style="color:navy; font-size: medium"> Recall for AdaBoost Classifer : {{recall[2]}}</p>
+    <p style="color:navy; font-size: medium"> F1-Score for AdaBoost Classifer : {{fscore[2]}}</p>
+    </div>
+        <div id="SV" style="display: none" >
+<img src="../static/pimg/vc.jpg"  width="400px" height="400px">
+    <br>
+    <p style="color:navy; font-size: medium"> Accuracy for Voting Classifer : {{accuracy[3]}}</p>
+    <p style="color:navy; font-size: medium"> Precision for Voting Classifer : {{precision[3]}}</p>
+    <p style="color:navy; font-size: medium"> Recall for Voting Classifer : {{recall[3]}}</p>
+    <p style="color:navy; font-size: medium"> F1-Score for Voting Classifer : {{fscore[3]}}</p>
+        </div>
+        <div id="NB" style="display: none">
+<img src="../static/pimg/dt.jpg"  width="400px" height="400px">
+    <br><p style="color:navy; font-size: medium"> Accuracy for Decision Trees Classifer : {{accuracy[4]}}</p>
+    <p style="color:navy; font-size: medium"> Precision for Decision Trees Classifer : {{precision[4]}}</p>
+    <p style="color:navy; font-size: medium"> Recall for Decision Trees Classifer : {{recall[4]}}</p>
+    <p style="color:navy; font-size: medium"> F1-Score for Decision Trees Classifer : {{fscore[4]}}</p>
+        </div>
+
+        <div id="CA" style="display: none">
+            <img src="../static/pimg/AlgComp.jpg" width="640px" height="480px"><br>
+        </div>
+</form>
+</div>
+
+	</div>
+
+<script>
+var myVar;
+
+function hide_rf() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_rf, 1500);
+}
+function show_rf() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('RF').innerHTML;
+}
+
+function hide_dt() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_dt, 1500);
+}
+function show_dt() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('DT').innerHTML;
+}
+
+function hide_sv() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_sv, 1500);
+}
+function show_sv() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('SV').innerHTML;
+}
+
+function hide_lr() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_lr, 1500);
+}
+function show_lr() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('LR').innerHTML;
+}
+
+function hide_nb() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_nb, 1500);
+}
+function show_nb() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('NB').innerHTML;
+}
+
+function hide_ca() {
+  document.getElementById("AccDisplay").style.display = "none";
+  document.getElementById("gear").style.display = "block";
+  myVar = setTimeout(show_ca, 1500);
+}
+function show_ca() {
+document.getElementById("gear").style.display = "none";
+document.getElementById("AccDisplay").style.display = "block";
+document.getElementById('AccDisplay').innerHTML=document.getElementById('CA').innerHTML;
+}
+</script>
+</body>
+
+</html>

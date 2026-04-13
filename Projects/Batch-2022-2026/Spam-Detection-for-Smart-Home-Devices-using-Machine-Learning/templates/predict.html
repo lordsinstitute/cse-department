@@ -1,0 +1,73 @@
+{% include "header_user.html" %}
+
+<div class="content">
+    <h2>IoT Device Spam Detection</h2>
+    <p style="color:#555; font-size:0.9em;">Enter the 10 PCA-transformed feature values for the IoT sensor record. These are derived from: Source ID, Source Address, Source Type, Source Location, Destination Service Address, Destination Service Type, Destination Location, Accessed Node Address, Accessed Node Type, Operation, Value.</p>
+        <form action="/predict" method="post">
+            <table>
+        <tr>
+        <td><label for="p0">PCA Component 1 (Source ID / Address): </label></td>
+        <td><input type="text" id="p0" name="p0" placeholder="e.g. -2.34"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p1">PCA Component 2 (Source Type / Location): </label></td>
+        <td><input type="text" id="p1" name="p1" placeholder="e.g. 0.87"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p2">PCA Component 3 (Destination Service Address): </label></td>
+        <td><input type="text" id="p2" name="p2" placeholder="e.g. 1.12"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p3">PCA Component 4 (Destination Service Type): </label></td>
+        <td><input type="text" id="p3" name="p3" placeholder="e.g. -0.45"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p4">PCA Component 5 (Destination Location): </label></td>
+        <td><input type="text" id="p4" name="p4" placeholder="e.g. 0.33"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p5">PCA Component 6 (Accessed Node Address): </label></td>
+        <td><input type="text" id="p5" name="p5" placeholder="e.g. -1.05"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p6">PCA Component 7 (Accessed Node Type): </label></td>
+        <td><input type="text" id="p6" name="p6" placeholder="e.g. 0.67"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p7">PCA Component 8 (Operation): </label></td>
+        <td><input type="text" id="p7" name="p7" placeholder="e.g. -0.22"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p8">PCA Component 9 (Value): </label></td>
+        <td><input type="text" id="p8" name="p8" placeholder="e.g. 0.91"></td>
+        </tr>
+
+        <tr>
+        <td><label for="p9">PCA Component 10 (Combined Features): </label></td>
+        <td><input type="text" id="p9" name="p9" placeholder="e.g. -0.14"></td>
+        </tr>
+
+        <tr>
+              <td colspan="2"><input type="submit" value="Predict"></td>
+        </tr>
+        </table>
+        </form>
+
+    {% if pred==1 %}
+        <div>
+            <h3>The sensor record is </h3><h2>SPAM!!</h2>
+        {% elif pred==0 %}
+            <h3>The sensor record is </h3><h2>VALID!!</h2>
+        {% else %}
+            <p></p>
+        {% endif %}
+        </div>
+</div>
