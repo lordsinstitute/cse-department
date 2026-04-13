@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Car Insurance Claim Prediction{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #1a1a2e; min-height: 100vh; }
+        .navbar { background-color: #16213e !important; }
+        .card { background-color: #1f2b47; border: 1px solid #2d3f5f; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); }
+        .badge-claim { background-color: #e74c3c; }
+        .badge-noclaim { background-color: #2ecc71; }
+    </style>
+</head>
+<body>
+    {% if session.get('user_id') %}
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="bi bi-shield-check"></i> Insurance Claim Predictor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}"><i class="bi bi-house"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('predict') }}"><i class="bi bi-search"></i> Predict</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('history') }}"><i class="bi bi-clock-history"></i> History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('visualize') }}"><i class="bi bi-bar-chart"></i> Visualize</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}"><i class="bi bi-info-circle"></i> About</a></li>
+                </ul>
+                <span class="navbar-text me-3">
+                    <i class="bi bi-person-circle"></i> {{ session.get('name', '') }}
+                    {% if session.get('role') == 'admin' %}<span class="badge bg-warning text-dark">Admin</span>{% endif %}
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

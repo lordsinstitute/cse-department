@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Insurance Claim Predictor{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+
+<!-- Model Comparison Table -->
+{% if models_info and models_info.get('models') %}
+<div class="card p-4 mb-4">
+    <h5>Model Performance Comparison</h5>
+    <div class="table-responsive">
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Accuracy</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1 Score</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for name, m in models_info['models'].items() %}
+            <tr {% if name == models_info.get('best_model') %}class="table-success"{% endif %}>
+                <td>
+                    {{ name }}
+                    {% if name == models_info.get('best_model') %}
+                    <span class="badge bg-success">Best</span>
+                    {% endif %}
+                </td>
+                <td>{{ m['accuracy'] }}%</td>
+                <td>{{ m['precision'] }}%</td>
+                <td>{{ m['recall'] }}%</td>
+                <td>{{ m['f1'] }}%</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card p-4">
+            <h5>Model Accuracy Comparison</h5>
+            <canvas id="accuracyChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-4">
+            <h5>Model F1 Score Comparison</h5>
+            <canvas id="f1Chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card p-4">
+            <h5>Your Prediction Distribution ({{ total }} total)</h5>
+            <canvas id="predChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-4">
+            <h5>Confidence Distribution</h5>
+            <canvas id="confChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Feature Importance -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card p-3">
+            <h5 class="text-center">Feature Importance (Random Forest)</h5>
+            <img src="{{ url_for('static', filename='vis/feature_importance.png') }}" class="img-fluid rounded" alt="Feature Importance"
+                 onerror="this.parentElement.innerHTML='<p class=text-muted>Run train_model.py to generate this chart.</p>'">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if models_info and models_info.get('models') %}
+const modelNames = {{ models_info['models'].keys()|list|tojson }};
+const accuracies = [{% for n, m in models_info['models'].items() %}{{ m['accuracy'] }},{% endfor %}];
+const f1Scores = [{% for n, m in models_info['models'].items() %}{{ m['f1'] }},{% endfor %}];
+const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
+
+new Chart(document.getElementById('accuracyChart'), {
+    type: 'bar',
+    data: {
+        labels: modelNames,
+        datasets: [{label: 'Accuracy %', data: accuracies, backgroundColor: colors}]
+    },
+    options: {scales: {y: {beginAtZero: false, min: 50}}, plugins: {legend: {display: false}}}
+});
+
+new Chart(document.getElementById('f1Chart'), {
+    type: 'bar',
+    data: {
+        labels: modelNames,
+        datasets: [{label: 'F1 Score %', data: f1Scores, backgroundColor: colors}]
+    },
+    options: {scales: {y: {beginAtZero: false, min: 50}}, plugins: {legend: {display: false}}}
+});
+{% endif %}
+
+const predData = JSON.parse('{{ pred_data|safe }}');
+new Chart(document.getElementById('predChart'), {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(predData),
+        datasets: [{data: Object.values(predData), backgroundColor: ['#e74c3c', '#2ecc71']}]
+    }
+});
+
+const confData = JSON.parse('{{ conf_data|safe }}');
+new Chart(document.getElementById('confChart'), {
+    type: 'pie',
+    data: {
+        labels: Object.keys(confData),
+        datasets: [{data: Object.values(confData), backgroundColor: ['#e74c3c', '#e67e22', '#f1c40f', '#3498db', '#9b59b6']}]
+    }
+});
+</script>
+{% endblock %}
