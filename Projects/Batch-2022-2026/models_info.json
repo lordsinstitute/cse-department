@@ -1,0 +1,26 @@
+{
+  "CNN (Deep Learning)": {
+    "accuracy": 100.0,
+    "precision": 100.0,
+    "recall": 100.0,
+    "f1": 100.0
+  },
+  "Random Forest": {
+    "accuracy": 99.5,
+    "precision": 100.0,
+    "recall": 99.0,
+    "f1": 99.5
+  },
+  "SVM": {
+    "accuracy": 98.0,
+    "precision": 97.06,
+    "recall": 99.0,
+    "f1": 98.02
+  },
+  "Logistic Regression": {
+    "accuracy": 98.0,
+    "precision": 98.98,
+    "recall": 97.0,
+    "f1": 97.98
+  }
+}
