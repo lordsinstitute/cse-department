@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-3">
+    <h2 class="fw-bold mb-1"><i class="bi bi-info-circle"></i> About VulnScanner</h2>
+    <p class="text-muted">A simple scanner for identifying web application vulnerabilities</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card p-4 mb-4">
+                <h4 class="text-info mb-3">What is VulnScanner?</h4>
+                <p>VulnScanner is a lightweight web application vulnerability scanner built with Python and Flask.
+                   It automates the detection of common security flaws in web applications, helping developers
+                   and security teams identify and fix vulnerabilities before they can be exploited.</p>
+
+                <h5 class="text-info mt-4 mb-3">Vulnerability Checks</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><span class="severity-critical">Critical:</span> SQL Injection</li>
+                            <li class="mb-2"><span class="severity-high">High:</span> Cross-Site Scripting (XSS)</li>
+                            <li class="mb-2"><span class="severity-high">High:</span> CSRF Vulnerability</li>
+                            <li class="mb-2"><span class="severity-high">High:</span> Directory Listing</li>
+                            <li class="mb-2"><span class="severity-medium">Medium:</span> Missing Security Headers</li>
+                            <li class="mb-2"><span class="severity-medium">Medium:</span> Missing CSP</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><span class="severity-medium">Medium:</span> Clickjacking</li>
+                            <li class="mb-2"><span class="severity-medium">Medium:</span> Insecure Cookies</li>
+                            <li class="mb-2"><span class="severity-low">Low:</span> Information Disclosure</li>
+                            <li class="mb-2"><span class="severity-low">Low:</span> Server Version Exposed</li>
+                            <li class="mb-2"><span class="severity-low">Low:</span> Mixed Content</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h5 class="text-info mt-4 mb-3">How It Works</h5>
+                <div class="row text-center mt-2">
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">1</h1>
+                        <strong>Enter URL</strong>
+                        <p><small>Provide the target website URL</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">2</h1>
+                        <strong>Scan</strong>
+                        <p><small>Engine checks for 11 vulnerability types</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">3</h1>
+                        <strong>Report</strong>
+                        <p><small>Get detailed findings with severity levels</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">4</h1>
+                        <strong>Fix</strong>
+                        <p><small>View vulnerable vs fixed code examples</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4 mb-4">
+                <h5 class="text-info mb-3">Tech Stack</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><strong style="color:#e63946;">Backend:</strong> Python, Flask</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Database:</strong> SQLite</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Scanner:</strong> Requests, BeautifulSoup</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Frontend:</strong> Bootstrap 5, Chart.js</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Security:</strong> Werkzeug (password hashing)</li>
+                </ul>
+            </div>
+
+            {% if session.get('user_id') %}
+            <div class="card p-4">
+                <h5 class="text-info mb-3"><i class="bi bi-chat-dots"></i> Send Feedback</h5>
+                <form method="POST">
+                    <div class="mb-3">
+                        <textarea name="feedback" class="form-control" rows="4" placeholder="Share your thoughts or suggestions..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-scan w-100">Submit Feedback</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
