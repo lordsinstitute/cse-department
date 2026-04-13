@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Prediction History — EmotionAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-clock-rotate-left me-2" style="color: var(--violet);"></i>Prediction History</h2>
+    <p>View all your past emotion predictions.</p>
+</div>
+
+{% if predictions %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-list me-2"></i>{{ predictions|length }} Prediction{{ 's' if predictions|length != 1 }}</span>
+        <a href="{{ url_for('predict') }}" class="btn btn-violet btn-sm">
+            <i class="fas fa-plus me-2"></i>New Prediction
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 80px;">Image</th>
+                        <th>Emotion</th>
+                        <th>Confidence</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    <tr>
+                        <td class="text-secondary">{{ loop.index }}</td>
+                        <td>
+                            <img src="{{ url_for('static', filename='uploads/' + pred['image_path']) }}"
+                                 class="prediction-img" alt="Prediction {{ loop.index }}">
+                        </td>
+                        <td>
+                            <span class="emotion-badge"
+                                  style="background: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }}20; color: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }}; border: 1px solid {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }};">
+                                <i class="fas {{ emotion_icons.get(pred['emotion'], 'fa-face-meh') }} me-1"></i>
+                                {{ pred['emotion'] }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress me-2" style="height: 8px; background: var(--bg-dark); width: 120px;">
+                                    <div class="progress-bar" style="width: {{ pred['confidence'] }}%; background: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }};"></div>
+                                </div>
+                                <span class="fw-bold" style="color: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }};">
+                                    {{ pred['confidence'] }}%
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <small class="text-secondary">
+                                <i class="fas fa-calendar me-1"></i>{{ pred['created_at'] }}
+                            </small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-inbox fa-4x mb-3" style="color: var(--violet); opacity: 0.4;"></i>
+        <h4 class="text-secondary">No Predictions Yet</h4>
+        <p class="text-secondary">Upload a face image to get your first emotion prediction.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-violet">
+            <i class="fas fa-camera me-2"></i>Make a Prediction
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

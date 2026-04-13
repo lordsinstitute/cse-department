@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EmotionAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-home me-2" style="color: var(--violet);"></i>Welcome, {{ session.get('name', 'User') }}!</h2>
+    <p>Your facial emotion recognition dashboard overview.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-camera"></i></div>
+            <div class="stat-value">{{ total_predictions }}</div>
+            <div class="stat-label">Total Predictions</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-face-smile"></i></div>
+            <div class="stat-value">7</div>
+            <div class="stat-label">Emotion Classes</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+            <div class="stat-value" style="font-size: 1.5rem;">{{ top_emotion }}</div>
+            <div class="stat-label">Top Emotion</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Emotion Distribution -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-chart-pie me-2"></i>Your Emotion Distribution
+            </div>
+            <div class="card-body">
+                {% if distribution %}
+                {% for row in distribution %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <i class="fas {{ emotion_icons.get(row['emotion'], 'fa-face-meh') }} me-2"
+                           style="color: {{ emotion_colors.get(row['emotion'], '#8b5cf6') }};"></i>
+                        <span>{{ row['emotion'] }}</span>
+                    </div>
+                    <div class="d-flex align-items-center" style="width: 60%;">
+                        <div class="progress flex-grow-1 me-2" style="height: 8px; background: var(--bg-dark);">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ (row['cnt'] / total_predictions * 100) if total_predictions > 0 else 0 }}%; background: {{ emotion_colors.get(row['emotion'], '#8b5cf6') }};">
+                            </div>
+                        </div>
+                        <span class="badge-violet">{{ row['cnt'] }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-camera fa-3x mb-3" style="color: var(--violet); opacity: 0.5;"></i>
+                    <p class="text-secondary">No predictions yet. Upload an image to get started!</p>
+                    <a href="{{ url_for('predict') }}" class="btn btn-violet">
+                        <i class="fas fa-camera me-2"></i>Make a Prediction
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-clock me-2"></i>Recent Predictions</span>
+                {% if recent %}
+                <a href="{{ url_for('history') }}" class="btn btn-outline-violet btn-sm">View All</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if recent %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Emotion</th>
+                                <th>Confidence</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in recent %}
+                            <tr>
+                                <td>
+                                    <img src="{{ url_for('static', filename='uploads/' + pred['image_path']) }}"
+                                         class="prediction-img" alt="Uploaded face">
+                                </td>
+                                <td>
+                                    <span class="emotion-badge"
+                                          style="background: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }}20; color: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }}; border: 1px solid {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }};">
+                                        <i class="fas {{ emotion_icons.get(pred['emotion'], 'fa-face-meh') }} me-1"></i>
+                                        {{ pred['emotion'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px; background: var(--bg-dark); width: 80px;">
+                                            <div class="progress-bar" style="width: {{ pred['confidence'] }}%; background: {{ emotion_colors.get(pred['emotion'], '#8b5cf6') }};"></div>
+                                        </div>
+                                        <small>{{ pred['confidence'] }}%</small>
+                                    </div>
+                                </td>
+                                <td><small class="text-secondary">{{ pred['created_at'] }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x mb-3" style="color: var(--violet); opacity: 0.5;"></i>
+                    <p class="text-secondary">No predictions yet.</p>
+                    <a href="{{ url_for('predict') }}" class="btn btn-violet">
+                        <i class="fas fa-camera me-2"></i>Make a Prediction
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <a href="{{ url_for('predict') }}" class="text-decoration-none">
+            <div class="card text-center p-4">
+                <i class="fas fa-upload fa-2x mb-2" style="color: var(--violet);"></i>
+                <h6>Upload & Predict</h6>
+                <small class="text-secondary">Detect emotion from a face image</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('dashboard') }}" class="text-decoration-none">
+            <div class="card text-center p-4">
+                <i class="fas fa-chart-bar fa-2x mb-2" style="color: var(--violet);"></i>
+                <h6>Model Dashboard</h6>
+                <small class="text-secondary">View model performance metrics</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('about') }}" class="text-decoration-none">
+            <div class="card text-center p-4">
+                <i class="fas fa-info-circle fa-2x mb-2" style="color: var(--violet);"></i>
+                <h6>About Project</h6>
+                <small class="text-secondary">Learn about the system and emotions</small>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

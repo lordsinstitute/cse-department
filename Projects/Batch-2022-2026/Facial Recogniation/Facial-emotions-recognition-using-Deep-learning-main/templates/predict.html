@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Predict Emotion — EmotionAI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-zone {
+        border: 2px dashed var(--violet);
+        border-radius: 16px;
+        padding: 50px 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: rgba(139, 92, 246, 0.05);
+    }
+    .upload-zone:hover {
+        background: rgba(139, 92, 246, 0.1);
+        border-color: var(--violet-light);
+    }
+    .upload-zone.dragover {
+        background: rgba(139, 92, 246, 0.15);
+        border-color: var(--violet-light);
+        transform: scale(1.01);
+    }
+    .result-card {
+        border: 2px solid var(--violet);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .confidence-bar {
+        height: 24px;
+        border-radius: 12px;
+        background: var(--bg-dark);
+        overflow: hidden;
+    }
+    .confidence-fill {
+        height: 100%;
+        border-radius: 12px;
+        transition: width 1s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .preview-img {
+        max-height: 300px;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+    }
+    .emotion-large-icon {
+        font-size: 4rem;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-camera me-2" style="color: var(--violet);"></i>Emotion Prediction</h2>
+    <p>Upload a face image to detect the emotion using our deep learning CNN model.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Upload Section -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-upload me-2"></i>Upload Face Image
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click();">
+                        <div id="uploadPlaceholder">
+                            <i class="fas fa-cloud-arrow-up fa-3x mb-3" style="color: var(--violet);"></i>
+                            <h5>Drag & Drop or Click to Upload</h5>
+                            <p class="text-secondary mb-0">Supports JPG, PNG, GIF, BMP, WEBP</p>
+                        </div>
+                        <img id="previewImage" class="preview-img d-none" alt="Preview">
+                    </div>
+                    <input type="file" name="image" id="fileInput" accept="image/*" class="d-none" onchange="previewFile(this);">
+                    <button type="submit" class="btn btn-violet w-100 mt-3" id="predictBtn" disabled>
+                        <i class="fas fa-brain me-2"></i>Detect Emotion
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card mt-3">
+            <div class="card-body p-3">
+                <h6 class="mb-2"><i class="fas fa-lightbulb me-2" style="color: #f59e0b;"></i>Tips for Best Results</h6>
+                <ul class="list-unstyled mb-0 small text-secondary">
+                    <li><i class="fas fa-check me-2" style="color: #22c55e;"></i>Use a clear, front-facing photo</li>
+                    <li><i class="fas fa-check me-2" style="color: #22c55e;"></i>Ensure good lighting on the face</li>
+                    <li><i class="fas fa-check me-2" style="color: #22c55e;"></i>One face per image works best</li>
+                    <li><i class="fas fa-check me-2" style="color: #22c55e;"></i>Avoid heavy filters or occlusions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="col-lg-6">
+        {% if result %}
+        <div class="card result-card" style="border-color: {{ result.color }};">
+            <div class="card-header text-center" style="background: {{ result.color }}20;">
+                <i class="fas fa-check-circle me-2" style="color: {{ result.color }};"></i>
+                <strong>Emotion Detected!</strong>
+            </div>
+            <div class="card-body text-center p-4">
+                {% if uploaded_image %}
+                <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}"
+                     class="preview-img mb-4" alt="Uploaded image" style="max-height: 200px;">
+                {% endif %}
+
+                <div class="emotion-large-icon" style="color: {{ result.color }};">
+                    <i class="fas {{ result.icon }}"></i>
+                </div>
+
+                <h2 class="fw-bold mb-1" style="color: {{ result.color }};">{{ result.emotion }}</h2>
+
+                <div class="my-4">
+                    <label class="form-label text-secondary">Confidence Level</label>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: {{ result.confidence }}%; background: {{ result.color }};">
+                            {{ result.confidence }}%
+                        </div>
+                    </div>
+                </div>
+
+                <span class="emotion-badge" style="background: {{ result.color }}; color: white; font-size: 1rem; padding: 8px 20px;">
+                    <i class="fas {{ result.icon }} me-2"></i>{{ result.emotion }} — {{ result.confidence }}%
+                </span>
+            </div>
+        </div>
+
+        {% elif error %}
+        <div class="card" style="border-color: #ef4444;">
+            <div class="card-header text-center" style="background: rgba(239, 68, 68, 0.1);">
+                <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                <strong class="text-danger">Detection Failed</strong>
+            </div>
+            <div class="card-body text-center p-4">
+                {% if uploaded_image %}
+                <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}"
+                     class="preview-img mb-4" alt="Uploaded image" style="max-height: 200px;">
+                {% endif %}
+                <div class="mb-3">
+                    <i class="fas fa-face-sad-tear fa-4x text-danger mb-3"></i>
+                </div>
+                <p class="text-danger fw-bold">{{ error }}</p>
+                <a href="{{ url_for('predict') }}" class="btn btn-outline-violet mt-2">
+                    <i class="fas fa-redo me-2"></i>Try Again
+                </a>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="card h-100">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center py-5">
+                <i class="fas fa-robot fa-4x mb-3" style="color: var(--violet); opacity: 0.4;"></i>
+                <h5 class="text-secondary">Waiting for Image</h5>
+                <p class="text-secondary text-center">Upload a face image and the AI will detect the emotion with confidence score.</p>
+
+                <div class="row g-2 mt-3 w-100">
+                    {% for emotion in emotions %}
+                    <div class="col-6 col-md-4">
+                        <div class="text-center p-2" style="background: var(--bg-dark); border-radius: 8px;">
+                            <i class="fas {{ emotion_icons[emotion] }}" style="color: {{ emotion_colors[emotion] }};"></i>
+                            <small class="ms-1">{{ emotion }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewImage = document.getElementById('previewImage');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const predictBtn = document.getElementById('predictBtn');
+
+    function previewFile(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+                predictBtn.disabled = false;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+    });
+    dropZone.addEventListener('drop', e => {
+        fileInput.files = e.dataTransfer.files;
+        previewFile(fileInput);
+    });
+</script>
+{% endblock %}

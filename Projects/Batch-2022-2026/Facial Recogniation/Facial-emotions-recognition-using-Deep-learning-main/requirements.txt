@@ -1,0 +1,11 @@
+flask
+werkzeug
+torch
+torchvision
+opencv-python-headless
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+Pillow
