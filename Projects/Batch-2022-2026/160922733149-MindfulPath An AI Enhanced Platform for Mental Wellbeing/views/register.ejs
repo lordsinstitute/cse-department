@@ -1,0 +1,104 @@
+<%- include('partials/header') %>
+
+<div class="row justify-content-center mt-4">
+  <div class="col-md-7">
+    <div class="card glass-card p-4">
+      <div class="text-center mb-4">
+        <i class="bi bi-heart-pulse-fill text-accent" style="font-size: 2.5rem;"></i>
+        <h2 class="mt-2">Create Account</h2>
+        <p class="text-muted">Join MindfulPath for better mental wellbeing</p>
+      </div>
+      <form method="POST" action="/register" id="registerForm">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="bi bi-person"></i> Full Name</label>
+            <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="bi bi-envelope"></i> Email</label>
+            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="bi bi-lock"></i> Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Create a password" required minlength="6">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="bi bi-people"></i> Register As</label>
+            <select name="role" class="form-select" id="roleSelect">
+              <option value="user">User (Seeking Support)</option>
+              <option value="therapist">Therapist (Professional)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Therapist fields (hidden by default) -->
+        <div id="therapistFields" style="display: none;">
+          <hr>
+          <h5 class="text-accent mb-3"><i class="bi bi-briefcase"></i> Professional Details</h5>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Specialties</label>
+              <select name="specialties" class="form-select" multiple>
+                <option value="Depression">Depression</option>
+                <option value="Anxiety">Anxiety</option>
+                <option value="Stress Management">Stress Management</option>
+                <option value="Trauma/PTSD">Trauma/PTSD</option>
+                <option value="Self-Esteem">Self-Esteem</option>
+                <option value="Grief">Grief</option>
+                <option value="Mindfulness">Mindfulness</option>
+                <option value="Career Counseling">Career Counseling</option>
+              </select>
+              <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Education</label>
+              <input type="text" name="education" class="form-control" placeholder="e.g., PhD Clinical Psychology">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Experience (years)</label>
+              <input type="number" name="experience" class="form-control" placeholder="e.g., 5" min="1">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">License Number</label>
+              <input type="text" name="license" class="form-control" placeholder="e.g., RCI-CL-2024-1234">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Session Price (INR)</label>
+              <input type="number" name="session_price" class="form-control" placeholder="e.g., 500" min="100">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Therapeutic Approach</label>
+              <textarea name="approach" class="form-control" rows="2" placeholder="Describe your therapeutic approach..."></textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Languages</label>
+              <input type="text" name="languages" class="form-control" placeholder="e.g., English, Hindi, Urdu" value="English">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-accent w-100 mb-3">
+          <i class="bi bi-person-plus"></i> Register
+        </button>
+      </form>
+      <div class="text-center">
+        <span class="text-muted">Already have an account?</span>
+        <a href="/login" class="text-accent">Login here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('roleSelect').addEventListener('change', function() {
+    document.getElementById('therapistFields').style.display = this.value === 'therapist' ? 'block' : 'none';
+  });
+</script>
+
+<%- include('partials/footer') %>

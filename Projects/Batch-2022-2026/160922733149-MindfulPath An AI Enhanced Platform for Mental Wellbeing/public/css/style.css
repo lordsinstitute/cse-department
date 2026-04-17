@@ -1,0 +1,238 @@
+/* MindfulPath — Dark Theme CSS */
+
+:root {
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-light: rgba(124, 58, 237, 0.15);
+  --cyan: #06b6d4;
+  --bg-gradient: linear-gradient(135deg, #0d1b2a, #1b263b, #415a77);
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --mood-1: #ef4444;
+  --mood-2: #f97316;
+  --mood-3: #eab308;
+  --mood-4: #22c55e;
+  --mood-5: #06b6d4;
+}
+
+body {
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.glass-nav {
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.text-accent { color: var(--accent) !important; }
+.bg-accent { background-color: var(--accent) !important; }
+
+.btn-accent {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+/* Glass Cards */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+}
+
+/* Chat Styles */
+.chat-container {
+  height: calc(100vh - 120px);
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+}
+
+/* Row and column must fill the full container height */
+.chat-container > .row {
+  height: 100%;
+}
+
+.chat-container .col-md-9 {
+  height: 100%;
+  min-height: 0;
+}
+
+.chat-sidebar {
+  background: rgba(0, 0, 0, 0.2);
+  border-right: 1px solid var(--card-border);
+  overflow-y: auto;
+  height: 100%;
+}
+
+.chat-session-item {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background 0.2s;
+}
+.chat-session-item:hover,
+.chat-session-item.active {
+  background: var(--accent-light);
+}
+
+.crisis-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: #fca5a5;
+}
+
+.chat-messages {
+  flex: 1 1 0;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  scroll-behavior: smooth;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  line-height: 1.5;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.chat-bubble.bot {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble.user {
+  background: var(--accent);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.sentiment-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 6px;
+}
+.sentiment-dot.positive { background: #22c55e; }
+.sentiment-dot.neutral { background: #eab308; }
+.sentiment-dot.negative { background: #ef4444; }
+
+.chat-input-area {
+  border-top: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+/* Mood Picker */
+.mood-picker {
+  text-align: center;
+}
+
+.mood-option {
+  cursor: pointer;
+  text-align: center;
+  padding: 10px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  flex: 1;
+}
+.mood-option:hover {
+  background: var(--accent-light);
+}
+.mood-option input[type="radio"] {
+  display: none;
+}
+.mood-option input[type="radio"]:checked + .mood-emoji {
+  transform: scale(1.3);
+}
+.mood-option input[type="radio"]:checked ~ small {
+  color: var(--accent);
+  font-weight: bold;
+}
+.mood-emoji {
+  font-size: 2rem;
+  display: block;
+  transition: transform 0.2s;
+}
+.mood-option small {
+  display: block;
+  margin-top: 4px;
+  color: #999;
+}
+
+/* Meditation Content */
+.meditation-content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #d0d0d0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+}
+
+/* Tables */
+.table-dark {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(124, 58, 237, 0.1);
+}
+
+/* Alert customization */
+.alert {
+  border-radius: 12px;
+}
+
+/* Form controls */
+.form-control, .form-select {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--card-border);
+  color: #e0e0e0;
+}
+.form-control:focus, .form-select:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  color: #e0e0e0;
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-container { height: calc(100vh - 80px); }
+  .chat-sidebar { max-height: 200px; }
+  .chat-bubble { max-width: 90%; }
+}

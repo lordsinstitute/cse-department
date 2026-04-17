@@ -1,0 +1,145 @@
+<%- include('partials/header') %>
+
+<h2 class="mb-4"><i class="bi bi-info-circle text-accent"></i> About MindfulPath</h2>
+
+<div class="row g-4">
+  <!-- Left Column -->
+  <div class="col-md-7">
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Project Overview</h4>
+      <p>MindfulPath is an AI-powered mental wellbeing platform designed to provide accessible mental health support through technology. It combines Natural Language Processing (NLP), Cognitive Behavioral Therapy (CBT) principles, and modern web technologies to create a comprehensive wellness ecosystem.</p>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">How NLP Sentiment Analysis Works</h4>
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-chat-text text-info" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">Step 1: Input</h6>
+            <small class="text-muted">User types a message or journal entry</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-search text-warning" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">Step 2: Tokenization</h6>
+            <small class="text-muted">Text is split into individual words</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-bar-chart text-accent" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">Step 3: Scoring</h6>
+            <small class="text-muted">Each word is scored using the AFINN lexicon (positive or negative values)</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card p-3 text-center">
+            <i class="bi bi-emoji-smile text-success" style="font-size: 2rem;"></i>
+            <h6 class="mt-2">Step 4: Classification</h6>
+            <small class="text-muted">Overall sentiment labeled as positive, neutral, or negative</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">How the CBT Chatbot Works</h4>
+      <p>The AI chatbot uses rule-based Cognitive Behavioral Therapy (CBT) techniques to respond based on the user's emotional state:</p>
+      <div class="table-responsive">
+        <table class="table table-dark">
+          <thead><tr><th>Sentiment Level</th><th>CBT Technique</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge bg-danger">Very Negative</span></td><td>Validation + Grounding</td><td>Acknowledge emotions, anchor to present</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">Negative</span></td><td>Thought Record</td><td>Challenge negative thought patterns</td></tr>
+            <tr><td><span class="badge bg-secondary">Mild Negative</span></td><td>Behavioral Activation</td><td>Encourage positive activities</td></tr>
+            <tr><td><span class="badge bg-info">Neutral</span></td><td>Check-in + Psychoeducation</td><td>General wellness support</td></tr>
+            <tr><td><span class="badge bg-success">Positive</span></td><td>Reinforcement</td><td>Strengthen positive feelings</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small text-muted mt-2"><strong>Crisis Detection:</strong> If crisis keywords are detected (e.g., self-harm, suicidal thoughts), the bot immediately shows helpline information and supportive resources.</p>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h4 class="text-accent">Key Features</h4>
+      <div class="row g-2">
+        <div class="col-md-6">
+          <ul class="list-unstyled">
+            <li><i class="bi bi-check-circle text-accent"></i> AI-powered chatbot with NLP</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Mood tracking with journaling</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Sentiment analysis on text</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Guided meditation library</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-unstyled">
+            <li><i class="bi bi-check-circle text-accent"></i> Therapist directory & profiles</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Session booking system</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Role-based dashboards</li>
+            <li><i class="bi bi-check-circle text-accent"></i> Crisis detection & helplines</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="col-md-5">
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">Tech Stack</h4>
+      <table class="table table-dark table-sm">
+        <tbody>
+          <tr><td><strong>Backend</strong></td><td>Node.js + Express.js</td></tr>
+          <tr><td><strong>Frontend</strong></td><td>EJS Templates + Bootstrap 5</td></tr>
+          <tr><td><strong>Database</strong></td><td>SQLite (better-sqlite3)</td></tr>
+          <tr><td><strong>NLP Engine</strong></td><td>Sentiment (AFINN-based lexicon)</td></tr>
+          <tr><td><strong>Authentication</strong></td><td>JWT + bcryptjs</td></tr>
+          <tr><td><strong>Charts</strong></td><td>Chart.js</td></tr>
+          <tr><td><strong>Icons</strong></td><td>Bootstrap Icons</td></tr>
+          <tr><td><strong>Container</strong></td><td>Docker</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">User Roles</h4>
+      <div class="mb-3">
+        <h6><i class="bi bi-person text-info"></i> User</h6>
+        <small class="text-muted">Chat with AI, log moods, browse meditations, book therapy sessions</small>
+      </div>
+      <div class="mb-3">
+        <h6><i class="bi bi-person-badge text-success"></i> Therapist</h6>
+        <small class="text-muted">View and manage patient sessions, professional profile</small>
+      </div>
+      <div>
+        <h6><i class="bi bi-shield-check text-warning"></i> Admin</h6>
+        <small class="text-muted">System overview, user and session statistics</small>
+      </div>
+    </div>
+
+    <div class="card glass-card p-4 mb-4">
+      <h4 class="text-accent">NLP Techniques Used</h4>
+      <ul class="list-unstyled">
+        <li class="mb-2"><strong>AFINN Lexicon:</strong> A word list where each word is rated for sentiment from -5 (most negative) to +5 (most positive)</li>
+        <li class="mb-2"><strong>Comparative Score:</strong> Total sentiment score divided by the number of words, giving a normalized rating</li>
+        <li class="mb-2"><strong>Crisis Keyword Detection:</strong> Pattern matching for keywords indicating urgent mental health situations</li>
+        <li class="mb-2"><strong>CBT Response Selection:</strong> Rule-based engine that selects therapeutic techniques based on sentiment levels</li>
+      </ul>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h4 class="text-accent">Security Features</h4>
+      <ul class="list-unstyled">
+        <li><i class="bi bi-lock text-accent"></i> JWT token-based authentication</li>
+        <li><i class="bi bi-shield-lock text-accent"></i> bcrypt password hashing</li>
+        <li><i class="bi bi-person-check text-accent"></i> Role-based access control</li>
+        <li><i class="bi bi-cookie text-accent"></i> HTTP-only secure cookies</li>
+        <li><i class="bi bi-database-lock text-accent"></i> Parameterized SQL queries</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
