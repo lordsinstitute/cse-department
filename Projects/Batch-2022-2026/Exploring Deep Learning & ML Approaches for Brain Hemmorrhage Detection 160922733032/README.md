@@ -1,5 +1,12 @@
 # C16 — Exploring Deep Learning & ML Approaches for Brain Hemorrhage Detection
 
+## Team Members
+
+Muhammad Aasim Uz Zaman (160922733020)
+Syed Altamash Uddin Siddiqui (160922733032)
+Nawaz Khan (160922733037)
+Faiz Ur Rehman (160922733049)
+
 ## Project Structure
 
 ```
