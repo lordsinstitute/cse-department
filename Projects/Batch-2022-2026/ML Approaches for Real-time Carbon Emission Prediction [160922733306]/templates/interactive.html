@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Interactive Sliders — Carbon Emission Prediction{% endblock %}
+
+{% block extra_css %}
+<style>
+    .slider-group { margin-bottom: 1rem; }
+    .slider-group label {
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 0.85rem; margin-bottom: 0.3rem;
+    }
+    .slider-group label .val { color: #10b981; font-weight: 700; font-size: 0.95rem; }
+    input[type="range"] {
+        width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+        background: rgba(255,255,255,0.15); border-radius: 3px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+        background: #10b981; cursor: pointer;
+    }
+    .live-result {
+        text-align: center; padding: 1.5rem;
+        background: rgba(255,255,255,0.04); border-radius: 12px;
+        position: sticky; top: 80px;
+    }
+    .live-co2 { font-size: 3.5rem; font-weight: 800; transition: color 0.3s; }
+    .live-unit { font-size: 1rem; color: #aaa; }
+    .live-rating {
+        font-size: 1.4rem; padding: 0.4rem 1.2rem; border-radius: 50px;
+        font-weight: 700; display: inline-block; color: white;
+        transition: background 0.3s;
+    }
+    .live-ci { font-size: 0.85rem; color: #888; }
+    .footprint-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
+    .footprint-mini div { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 0.6rem; text-align: center; }
+    .footprint-mini h5 { color: #10b981; font-weight: 700; margin: 0; font-size: 1.1rem; }
+    .footprint-mini p { margin: 0; font-size: 0.72rem; color: #aaa; }
+    .live-recs { text-align: left; margin-top: 1rem; }
+    .live-recs .rec-item { font-size: 0.8rem; padding: 0.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .live-warnings { margin-top: 0.8rem; }
+    .live-warnings li { font-size: 0.78rem; color: #eab308; }
+    .updating-pulse { animation: pulse 0.3s ease; }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-2"><i class="bi bi-sliders2"></i> Interactive Sliders</h2>
+<p class="text-muted mb-4">Adjust sliders and see CO2 predictions update in real-time. No submit button needed.</p>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-sliders"></i> Adjust Parameters</div>
+            <div class="card-body">
+                <!-- Categorical selects -->
+                {% for col, options in categorical_options.items() %}
+                <div class="mb-2">
+                    <label class="form-label" style="font-size:0.85rem;">{{ col.replace('_', ' ') }}</label>
+                    <select id="slider_{{ col }}" class="form-select form-select-sm" onchange="debouncedPredict()">
+                        {% for opt in options %}
+                        <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+
+                <hr style="border-color: rgba(255,255,255,0.1);">
+
+                <!-- Numeric sliders -->
+                {% for col, cfg in numeric_ranges.items() %}
+                <div class="slider-group" id="sgroup_{{ col }}">
+                    <label>
+                        <span>{{ col.replace('_', ' ') }}{% if cfg.unit %} ({{ cfg.unit }}){% endif %}</span>
+                        <span class="val" id="sval_{{ col }}">{{ cfg.default }}</span>
+                    </label>
+                    <input type="range" id="slider_{{ col }}" min="{{ cfg.min }}" max="{{ cfg.max }}"
+                           step="{{ cfg.step }}" value="{{ cfg.default }}"
+                           oninput="updateSliderVal('{{ col }}', this.value); debouncedPredict();">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="live-result" id="liveResult">
+            <div class="live-co2" id="liveCo2" style="color: #10b981;">—</div>
+            <div class="live-unit">grams CO2 per kilometer</div>
+            <div class="live-ci" id="liveCi"></div>
+            <div class="mt-2">
+                <span class="live-rating" id="liveRating" style="background: #333;">—/10</span>
+            </div>
+            <div class="mt-1">
+                <span id="liveLabel" style="font-weight:600;font-size:1rem;"></span>
+            </div>
+
+            <div class="footprint-mini" id="liveFootprint">
+                <div><h5 id="fpTonnes">—</h5><p>Tonnes/Year</p></div>
+                <div><h5 id="fpMonthly">—</h5><p>kg/Month</p></div>
+                <div><h5 id="fpTrees">—</h5><p>Trees to Offset</p></div>
+                <div><h5 id="fpAnnual">—</h5><p>kg/Year</p></div>
+            </div>
+
+            <div class="live-warnings" id="liveWarnings" style="display:none;">
+                <small class="text-warning fw-bold"><i class="bi bi-exclamation-triangle"></i> Warnings</small>
+                <ul class="mb-0 ps-3" id="warningList"></ul>
+            </div>
+
+            <div class="live-recs" id="liveRecs"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const constraints = {{ class_constraints|safe }};
+    let debounceTimer = null;
+
+    function updateSliderVal(col, val) {
+        document.getElementById('sval_' + col).textContent = val;
+    }
+
+    function debouncedPredict() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(runPrediction, 200);
+    }
+
+    function getFormData() {
+        const data = {};
+        const cats = {{ categorical_options.keys()|list|tojson }};
+        const nums = {{ numeric_ranges.keys()|list|tojson }};
+        cats.forEach(c => { data[c] = document.getElementById('slider_' + c).value; });
+        nums.forEach(n => { data[n] = document.getElementById('slider_' + n).value; });
+        return data;
+    }
+
+    async function runPrediction() {
+        const data = getFormData();
+
+        // Handle electric
+        if (data.Fuel_Type === 'Electric') {
+            ['Engine_Size', 'Cylinders', 'Fuel_Consumption_City', 'Fuel_Consumption_Hwy', 'Fuel_Consumption_Comb'].forEach(f => {
+                document.getElementById('slider_' + f).value = 0;
+                updateSliderVal(f, '0');
+                data[f] = '0';
+            });
+        }
+
+        try {
+            const res = await fetch('/api/predict-live', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const r = await res.json();
+            if (r.error) return;
+
+            // Update display
+            const co2El = document.getElementById('liveCo2');
+            co2El.textContent = r.co2;
+            co2El.style.color = r.color;
+            co2El.classList.remove('updating-pulse');
+            void co2El.offsetWidth;
+            co2El.classList.add('updating-pulse');
+
+            document.getElementById('liveCi').textContent =
+                r.conf_low !== r.conf_high ? `90% CI: ${r.conf_low} — ${r.conf_high} g/km` : '';
+
+            const ratingEl = document.getElementById('liveRating');
+            ratingEl.textContent = r.rating + '/10';
+            ratingEl.style.background = r.color;
+
+            const labelEl = document.getElementById('liveLabel');
+            labelEl.textContent = r.label + ' Emissions';
+            labelEl.style.color = r.color;
+
+            // Footprint
+            if (r.footprint) {
+                document.getElementById('fpTonnes').textContent = r.footprint.annual_tonnes;
+                document.getElementById('fpMonthly').textContent = r.footprint.monthly_kg;
+                document.getElementById('fpTrees').textContent = r.footprint.trees_needed;
+                document.getElementById('fpAnnual').textContent = r.footprint.annual_kg;
+            }
+
+            // Warnings
+            const warnDiv = document.getElementById('liveWarnings');
+            const warnList = document.getElementById('warningList');
+            if (r.warnings && r.warnings.length > 0) {
+                warnDiv.style.display = '';
+                warnList.innerHTML = r.warnings.map(w => '<li>' + w + '</li>').join('');
+            } else {
+                warnDiv.style.display = 'none';
+            }
+
+            // Recommendations
+            const recsDiv = document.getElementById('liveRecs');
+            if (r.recommendations && r.recommendations.length > 0) {
+                recsDiv.innerHTML = r.recommendations.map(rec =>
+                    '<div class="rec-item"><i class="bi bi-check-circle text-emerald me-1"></i>' + rec + '</div>'
+                ).join('');
+            } else {
+                recsDiv.innerHTML = '';
+            }
+
+        } catch (err) {
+            console.error('Prediction error:', err);
+        }
+    }
+
+    // Handle fuel type change
+    document.getElementById('slider_Fuel_Type').addEventListener('change', function() {
+        const isElectric = this.value === 'Electric';
+        ['Engine_Size', 'Cylinders', 'Fuel_Consumption_City', 'Fuel_Consumption_Hwy', 'Fuel_Consumption_Comb'].forEach(f => {
+            const slider = document.getElementById('slider_' + f);
+            if (isElectric) {
+                slider.value = 0;
+                slider.disabled = true;
+                slider.style.opacity = '0.4';
+                updateSliderVal(f, '0');
+            } else {
+                slider.disabled = false;
+                slider.style.opacity = '1';
+            }
+        });
+    });
+
+    // Run initial prediction on page load
+    document.addEventListener('DOMContentLoaded', runPrediction);
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{
+  "models": {
+    "Linear Regression": {
+      "r2": 95.3,
+      "mae": 14.97,
+      "mse": 432.47,
+      "rmse": 20.8
+    },
+    "Random Forest": {
+      "r2": 99.7,
+      "mae": 3.42,
+      "mse": 27.69,
+      "rmse": 5.26
+    },
+    "Decision Tree": {
+      "r2": 99.25,
+      "mae": 4.77,
+      "mse": 69.42,
+      "rmse": 8.33
+    },
+    "XGBoost": {
+      "r2": 99.72,
+      "mae": 3.69,
+      "mse": 25.83,
+      "rmse": 5.08
+    },
+    "AdaBoost": {
+      "r2": 96.83,
+      "mae": 14.18,
+      "mse": 291.68,
+      "rmse": 17.08
+    },
+    "Lasso": {
+      "r2": 95.23,
+      "mae": 15.39,
+      "mse": 439.27,
+      "rmse": 20.96
+    }
+  },
+  "best_model": "XGBoost",
+  "features": [
+    "Make",
+    "Vehicle_Class",
+    "Transmission",
+    "Fuel_Type",
+    "Engine_Size",
+    "Cylinders",
+    "Vehicle_Weight",
+    "Model_Year",
+    "Fuel_Consumption_City",
+    "Fuel_Consumption_Hwy",
+    "Fuel_Consumption_Comb"
+  ],
+  "categorical_features": [
+    "Make",
+    "Vehicle_Class",
+    "Transmission",
+    "Fuel_Type"
+  ],
+  "numeric_features": [
+    "Engine_Size",
+    "Cylinders",
+    "Vehicle_Weight",
+    "Model_Year",
+    "Fuel_Consumption_City",
+    "Fuel_Consumption_Hwy",
+    "Fuel_Consumption_Comb"
+  ],
+  "train_size": 4900,
+  "test_size": 2100
+}

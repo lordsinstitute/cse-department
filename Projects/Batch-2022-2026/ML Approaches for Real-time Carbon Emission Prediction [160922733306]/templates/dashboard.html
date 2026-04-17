@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Carbon Emission Prediction{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Model Performance Dashboard</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ total_preds }}</h3>
+            <p>Total Predictions</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ avg_co2 }} g/km</h3>
+            <p>Average Predicted CO2</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ models_info['best_model'] if models_info else 'N/A' }}</h3>
+            <p>Best Model</p>
+        </div>
+    </div>
+</div>
+
+{% if models_info %}
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> R² Score Comparison (%)</div>
+            <div class="card-body">
+                <canvas id="r2Chart" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> MAE Comparison (g/km)</div>
+            <div class="card-body">
+                <canvas id="maeChart" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> RMSE Comparison (g/km)</div>
+            <div class="card-body">
+                <canvas id="rmseChart" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> CO2 Rating Distribution</div>
+            <div class="card-body">
+                <canvas id="ratingChart" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-table"></i> Detailed Model Metrics</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>R² Score (%)</th>
+                        <th>MAE (g/km)</th>
+                        <th>MSE</th>
+                        <th>RMSE (g/km)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, m in models_info['models'].items() %}
+                    <tr {% if name == models_info['best_model'] %}style="color: #10b981; font-weight: 600;"{% endif %}>
+                        <td>
+                            {{ name }}
+                            {% if name == models_info['best_model'] %}
+                            <span class="badge bg-success ms-1">Best</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ m['r2'] }}%</td>
+                        <td>{{ m['mae'] }}</td>
+                        <td>{{ m['mse'] }}</td>
+                        <td>{{ m['rmse'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <p class="text-muted">Model metrics not available. Run train_model.py first.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% if models_info %}
+<script>
+    const modelNames = {{ models_info['models'].keys()|list|tojson }};
+    const r2Scores = [{% for n, m in models_info['models'].items() %}{{ m['r2'] }}{% if not loop.last %},{% endif %}{% endfor %}];
+    const maeScores = [{% for n, m in models_info['models'].items() %}{{ m['mae'] }}{% if not loop.last %},{% endif %}{% endfor %}];
+    const rmseScores = [{% for n, m in models_info['models'].items() %}{{ m['rmse'] }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+    const barColors = ['#10b981', '#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444'];
+
+    function createBarChart(canvasId, data, label, color) {
+        new Chart(document.getElementById(canvasId), {
+            type: 'bar',
+            data: {
+                labels: modelNames,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: barColors,
+                    borderWidth: 0,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' } },
+                    x: { grid: { display: false }, ticks: { color: '#aaa', maxRotation: 45 } }
+                }
+            }
+        });
+    }
+
+    createBarChart('r2Chart', r2Scores, 'R² Score (%)', '#10b981');
+    createBarChart('maeChart', maeScores, 'MAE (g/km)', '#f97316');
+    createBarChart('rmseChart', rmseScores, 'RMSE (g/km)', '#ef4444');
+
+    // Rating distribution
+    const ratingDist = {{ rating_dist|safe }};
+    const ratingLabels = Object.keys(ratingDist).sort();
+    const ratingValues = ratingLabels.map(k => ratingDist[k]);
+    const ratingColors = ratingLabels.map(r => {
+        r = parseInt(r);
+        if (r >= 8) return '#22c55e';
+        if (r >= 6) return '#84cc16';
+        if (r >= 4) return '#eab308';
+        if (r >= 2) return '#f97316';
+        return '#ef4444';
+    });
+
+    new Chart(document.getElementById('ratingChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ratingLabels.map(r => 'Rating ' + r),
+            datasets: [{
+                data: ratingValues,
+                backgroundColor: ratingColors,
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#aaa', padding: 12 } }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
