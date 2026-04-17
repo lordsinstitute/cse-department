@@ -1,5 +1,11 @@
 # B10 — Machine Learning Based Detection of DDoS Attacks in SDN
 
+## TEAM MEMBERS
+|NAme | ROLL NUMBER |
+| zeba fatima 160922733006
+|sania khan 160922733007|
+|shaik fathima 160922733046|
+|fouzia fatima 160922733303|
 ## Project Structure
 
 ```
