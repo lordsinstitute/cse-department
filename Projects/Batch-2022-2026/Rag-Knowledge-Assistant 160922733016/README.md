@@ -2,6 +2,13 @@
 
 A multi-product knowledge assistant powered by Retrieval-Augmented Generation (RAG). Upload documents or scrape websites per product, then ask questions — the system retrieves relevant context and generates accurate answers using Claude AI.
 
+## Team Members
+
+Abdul Matin Moiz Ahmed (16092733016)
+Mohammed Khaja Rahmatullah (160922733023 )
+Habeeb Mujtaba Wasif (160922733018)
+Abubakr Khushtar (160922733015)
+
 ---
 
 ## What is This Product?
