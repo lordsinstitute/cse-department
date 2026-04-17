@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeForge — Dynamic Resume Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ==================== LOGIN MODAL ==================== -->
+    <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content login-modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-file-earmark-person-fill text-warning me-2"></i>ResumeForge
+                    </h5>
+                </div>
+                <div class="modal-body pt-2">
+                    <p class="text-muted small text-center mb-3">Sign in to save and sync your resume data</p>
+                    <ul class="nav nav-tabs login-tabs mb-3" id="authTabs">
+                        <li class="nav-item flex-fill text-center">
+                            <button class="nav-link active w-100" id="loginTabBtn" onclick="switchAuthTab('login')">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            </button>
+                        </li>
+                        <li class="nav-item flex-fill text-center">
+                            <button class="nav-link w-100" id="registerTabBtn" onclick="switchAuthTab('register')">
+                                <i class="bi bi-person-plus me-1"></i>Register
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Login Form -->
+                    <div id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label small">Username</label>
+                            <input type="text" class="form-control" id="loginUsername" placeholder="Enter username" autocomplete="username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+                        </div>
+                        <div id="loginError" class="alert alert-danger py-2 small d-none"></div>
+                        <button class="btn btn-warning w-100 fw-bold" onclick="loginUser()">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                        </button>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Don't have an account? <a href="#" class="text-warning" onclick="switchAuthTab('register'); return false;">Register</a></small>
+                        </div>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="registerForm" style="display:none">
+                        <div class="mb-3">
+                            <label class="form-label small">Full Name</label>
+                            <input type="text" class="form-control" id="registerName" placeholder="Your full name" autocomplete="name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Username</label>
+                            <input type="text" class="form-control" id="registerUsername" placeholder="Choose a username" autocomplete="username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Choose a password" autocomplete="new-password">
+                        </div>
+                        <div id="registerError" class="alert alert-danger py-2 small d-none"></div>
+                        <button class="btn btn-warning w-100 fw-bold" onclick="registerUser()">
+                            <i class="bi bi-person-plus me-1"></i>Create Account
+                        </button>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Already have an account? <a href="#" class="text-warning" onclick="switchAuthTab('login'); return false;">Sign In</a></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== DELETE CONFIRMATION MODAL ==================== -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content delete-confirm-modal">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Delete
+                    </h6>
+                </div>
+                <div class="modal-body py-2">
+                    <p class="small mb-0">Are you sure you want to delete <strong id="deleteEntryName"></strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-sm btn-danger" onclick="executeDelete()">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== RESET CONFIRMATION MODAL ==================== -->
+    <div class="modal fade" id="resetModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content delete-confirm-modal">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title text-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Reset Resume
+                    </h6>
+                </div>
+                <div class="modal-body py-2">
+                    <p class="small mb-0">This will clear all resume data and start fresh. This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-sm btn-warning" onclick="resetResume()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SETTINGS MODAL (API KEY) ==================== -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content login-modal-content">
+                <div class="modal-header border-0">
+                    <h6 class="modal-title"><i class="bi bi-gear-fill text-warning me-2"></i>Settings</h6>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="small text-warning mb-2"><i class="bi bi-stars me-1"></i>AI Suggestions (Claude API)</h6>
+                    <p class="small text-muted mb-3">Enter your Anthropic API key to enable AI-powered content suggestions and rewriting.</p>
+                    <div class="mb-3">
+                        <label class="form-label small">Claude API Key</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility()">
+                                <i class="bi bi-eye" id="apiKeyEyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="form-text text-muted small">Your key is stored locally in your browser only.</div>
+                    </div>
+                    <button class="btn btn-warning btn-sm" onclick="saveApiKeyFromModal()">
+                        <i class="bi bi-save me-1"></i>Save API Key
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" onclick="clearApiKey()">
+                        <i class="bi bi-x-circle me-1"></i>Clear Key
+                    </button>
+                    <div id="apiKeySavedMsg" class="alert alert-success py-1 small mt-2 d-none">API key saved successfully!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary fixed-top">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-file-earmark-person-fill text-warning me-2"></i>ResumeForge
+            </a>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="ats-badge me-1" id="atsBadge" title="ATS Compatibility Score">
+                    <i class="bi bi-shield-check"></i>
+                    <span id="atsScoreNav">0%</span> ATS
+                </div>
+                <!-- User info -->
+                <div id="userDisplay" class="d-none d-flex align-items-center gap-2">
+                    <span class="text-muted small"><i class="bi bi-person-circle me-1"></i><span id="userNameDisplay"></span></span>
+                    <button class="btn btn-outline-danger btn-sm" onclick="logoutUser()" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </div>
+                <!-- Undo / Redo -->
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" id="undoBtn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" id="redoBtn" onclick="redo()" title="Redo (Ctrl+Y)" disabled>
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <div class="btn-group btn-group-sm me-1">
+                    <button class="btn btn-outline-light" onclick="saveToLocal()" title="Save to Browser">
+                        <i class="bi bi-download"></i> Save
+                    </button>
+                    <button class="btn btn-outline-light" onclick="loadFromLocal()" title="Load from Browser">
+                        <i class="bi bi-upload"></i> Load
+                    </button>
+                </div>
+                <!-- Reset button -->
+                <button class="btn btn-outline-warning btn-sm me-1" onclick="showResetModal()" title="Reset Resume">
+                    <i class="bi bi-exclamation-triangle"></i> Reset
+                </button>
+                <div class="btn-group btn-group-sm me-1">
+                    <button class="btn btn-outline-info" onclick="exportJSON()" title="Export as JSON">
+                        <i class="bi bi-filetype-json"></i>
+                    </button>
+                    <button class="btn btn-outline-info" onclick="document.getElementById('importJSON').click()" title="Import JSON">
+                        <i class="bi bi-box-arrow-in-down"></i>
+                    </button>
+                    <input type="file" id="importJSON" accept=".json" style="display:none" onchange="importJSON(event)">
+                </div>
+                
+                <!-- Settings (gear) -->
+                <button class="btn btn-outline-secondary btn-sm" onclick="openSettings()" title="Settings / API Key">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="btn btn-warning btn-sm fw-bold" onclick="exportPDF()">
+                    <i class="bi bi-file-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== MAIN LAYOUT ==================== -->
+    <div class="main-container">
+
+        <!-- LEFT PANEL: Form Editor -->
+        <div class="editor-panel" id="editorPanel">
+        <div class="editor-header">
+            <h6 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Resume Editor</h6>
+            <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary" id="togglePreviewBtn" onclick="togglePreview()" title="Hide Preview">
+                    <i class="bi bi-layout-sidebar-inset"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleEditor()" title="Toggle Editor">
+                    <i class="bi bi-arrows-collapse"></i>
+                </button>
+            </div>
+        </div>
+
+            <!-- Template Selector -->
+            <div class="template-selector px-3 py-2">
+                <label class="form-label small text-muted mb-1">Template</label>
+                <div class="d-flex gap-1 flex-wrap">
+                    <button class="template-btn active" data-template="professional" onclick="setTemplate('professional')">
+                        <i class="bi bi-briefcase"></i> Professional
+                    </button>
+                    <button class="template-btn" data-template="modern" onclick="setTemplate('modern')">
+                        <i class="bi bi-palette"></i> Modern
+                    </button>
+                    <button class="template-btn" data-template="minimal" onclick="setTemplate('minimal')">
+                        <i class="bi bi-subtract"></i> Minimal
+                    </button>
+                    <button class="template-btn" data-template="creative" onclick="setTemplate('creative')">
+                        <i class="bi bi-brush"></i> Creative
+                    </button>
+                    <button class="template-btn" data-template="executive" onclick="setTemplate('executive')">
+                        <i class="bi bi-building"></i> Executive
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Progress Bar -->
+            <div class="progress-bar-container px-3 py-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small text-muted mb-0">Profile Completeness</label>
+                    <span class="small fw-bold" id="progressPercent">0%</span>
+                </div>
+                <div class="progress" style="height: 8px; background: #2a2a4a;">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%; background: #e74c3c;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="small text-muted mt-1" id="progressLabel"></div>
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="section-tab active" data-section="personal" onclick="showSection('personal')">
+                    <i class="bi bi-person"></i> Personal
+                </button>
+                <button class="section-tab" data-section="experience" onclick="showSection('experience')">
+                    <i class="bi bi-briefcase"></i> Experience
+                </button>
+                <button class="section-tab" data-section="education" onclick="showSection('education')">
+                    <i class="bi bi-mortarboard"></i> Education
+                </button>
+                <button class="section-tab" data-section="skills" onclick="showSection('skills')">
+                    <i class="bi bi-tools"></i> Skills
+                </button>
+                <button class="section-tab" data-section="projects" onclick="showSection('projects')">
+                    <i class="bi bi-kanban"></i> Projects
+                </button>
+                <button class="section-tab" data-section="certifications" onclick="showSection('certifications')">
+                    <i class="bi bi-award"></i> Certs
+                </button>
+                <button class="section-tab" data-section="awards" onclick="showSection('awards')">
+                    <i class="bi bi-trophy"></i> Awards
+                </button>
+                <button class="section-tab" data-section="ats" onclick="showSection('ats')">
+                    <i class="bi bi-shield-check"></i> ATS
+                </button>
+            </div>
+
+            <!-- Form Sections -->
+            <div class="form-container">
+
+                <!-- PERSONAL INFO -->
+                <div class="form-section active" id="section-personal">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-person-vcard me-2"></i>Personal Information</h6>
+                        <button class="btn btn-sm btn-outline-info" onclick="checkGrammarSection('personal')" title="Check Writing">
+                            <i class="bi bi-spell-check"></i> Check
+                        </button>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small">First Name *</label>
+                            <input type="text" class="form-control form-control-sm" id="firstName" placeholder="John" oninput="updatePreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Last Name *</label>
+                            <input type="text" class="form-control form-control-sm" id="lastName" placeholder="Doe" oninput="updatePreview()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small">Professional Title</label>
+                            <input type="text" class="form-control form-control-sm" id="title" placeholder="Full Stack Developer" oninput="updatePreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Email *</label>
+                            <input type="email" class="form-control form-control-sm" id="email" placeholder="john@example.com" oninput="updatePreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Phone *</label>
+                            <input type="tel" class="form-control form-control-sm" id="phone" placeholder="+91 98765 43210" oninput="updatePreview()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small">Location</label>
+                            <input type="text" class="form-control form-control-sm" id="location" placeholder="Hyderabad, India" oninput="updatePreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">LinkedIn</label>
+                            <input type="text" class="form-control form-control-sm" id="linkedin" placeholder="linkedin.com/in/johndoe" oninput="updatePreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">GitHub</label>
+                            <input type="text" class="form-control form-control-sm" id="github" placeholder="github.com/johndoe" oninput="updatePreview()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small">Portfolio Website</label>
+                            <input type="text" class="form-control form-control-sm" id="website" placeholder="johndoe.dev" oninput="updatePreview()">
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small mb-0">Professional Summary</label>
+                                <button class="btn btn-xs btn-outline-warning ai-suggest-btn" onclick="triggerAISuggest('summary', 'summary')" title="AI Rewrite">
+                                    <i class="bi bi-stars"></i> AI
+                                </button>
+                            </div>
+                            <textarea class="form-control form-control-sm" id="summary" rows="3" spellcheck="true" placeholder="A brief 2-3 sentence summary of your professional background, key skills, and career goals..." oninput="updatePreview()"></textarea>
+                            <div class="ai-suggestion-panel d-none" id="ai-panel-summary"></div>
+                            <div id="grammar-summary"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPERIENCE -->
+                <div class="form-section" id="section-experience">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-briefcase me-2"></i>Work Experience</h6>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-info" onclick="checkGrammarSection('experience')" title="Check Writing">
+                                <i class="bi bi-spell-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="addExperience()">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <div id="experienceList"></div>
+                    <div class="empty-state" id="expEmpty">
+                        <i class="bi bi-briefcase"></i>
+                        <p>No experience added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- EDUCATION -->
+                <div class="form-section" id="section-education">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-mortarboard me-2"></i>Education</h6>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-info" onclick="checkGrammarSection('education')" title="Check Writing">
+                                <i class="bi bi-spell-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="addEducation()">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <div id="educationList"></div>
+                    <div class="empty-state" id="eduEmpty">
+                        <i class="bi bi-mortarboard"></i>
+                        <p>No education added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- SKILLS -->
+                <div class="form-section" id="section-skills">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-tools me-2"></i>Skills</h6>
+                        <button class="btn btn-sm btn-outline-info ms-1" onclick="suggestSkills()" title="AI Skill Suggestions">
+                            <i class="bi bi-magic"></i> Suggest
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="addSkill()">
+                            <i class="bi bi-plus-lg"></i> Add
+                        </button>
+                    </div>
+                    <div id="skillsList"></div>
+                    <div class="empty-state" id="skillEmpty">
+                        <i class="bi bi-tools"></i>
+                        <p>No skills added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- PROJECTS -->
+                <div class="form-section" id="section-projects">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-kanban me-2"></i>Projects</h6>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-info" onclick="checkGrammarSection('projects')" title="Check Writing">
+                                <i class="bi bi-spell-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="addProject()">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <div id="projectsList"></div>
+                    <div class="empty-state" id="projEmpty">
+                        <i class="bi bi-kanban"></i>
+                        <p>No projects added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- CERTIFICATIONS -->
+                <div class="form-section" id="section-certifications">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-award me-2"></i>Certifications</h6>
+                        <button class="btn btn-sm btn-outline-warning" onclick="addCertification()">
+                            <i class="bi bi-plus-lg"></i> Add
+                        </button>
+                    </div>
+                    <div id="certificationsList"></div>
+                    <div class="empty-state" id="certEmpty">
+                        <i class="bi bi-award"></i>
+                        <p>No certifications added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- AWARDS -->
+                <div class="form-section" id="section-awards">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="section-title mb-0"><i class="bi bi-trophy me-2"></i>Awards & Achievements</h6>
+                        <button class="btn btn-sm btn-outline-warning" onclick="addAward()">
+                            <i class="bi bi-plus-lg"></i> Add
+                        </button>
+                    </div>
+                    <div id="awardsList"></div>
+                    <div class="empty-state" id="awardEmpty">
+                        <i class="bi bi-trophy"></i>
+                        <p>No awards added yet. Click "Add" to get started.</p>
+                    </div>
+                </div>
+
+                <!-- ATS SCORE -->
+                <div class="form-section" id="section-ats">
+                    <h6 class="section-title"><i class="bi bi-shield-check me-2"></i>ATS Compatibility Check</h6>
+                    <div class="ats-panel">
+                        <div class="ats-score-circle" id="atsScoreCircle">
+                            <svg viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="54" fill="none" stroke="#333" stroke-width="8"/>
+                                <circle cx="60" cy="60" r="54" fill="none" stroke="#ffc107" stroke-width="8"
+                                    stroke-dasharray="339.29" stroke-dashoffset="339.29" id="atsCircle"
+                                    stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                            </svg>
+                            <div class="ats-score-text">
+                                <span id="atsScoreValue">0</span>%
+                            </div>
+                        </div>
+                        <div class="ats-details mt-3" id="atsDetails">
+                            <p class="text-muted small">Fill in your resume to see ATS compatibility analysis.</p>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label small">Paste Job Description (optional)</label>
+                            <textarea class="form-control form-control-sm" id="jobDescription" rows="4" spellcheck="true"
+                                placeholder="Paste the job description here to check keyword matching..."
+                                oninput="calculateATS()"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100 mt-2" onclick="generateCoverLetter()">
+                            <i class="bi bi-envelope-paper me-1"></i> Generate Cover Letter
+                        </button>
+                        <div id="coverLetterResult" class="mt-3" style="display: none;">
+                            <div class="card bg-dark border-secondary">
+                                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                    <span class="small text-warning"><i class="bi bi-envelope-paper-fill me-1"></i>Generated Cover Letter</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="editCoverLetter()" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="copyCoverLetter()" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="coverLetterText" class="small" style="white-space: pre-wrap;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-info btn-sm w-100 mt-2" onclick="analyzeKeywordGap()">
+                            <i class="bi bi-search-heart me-1"></i> AI Keyword Gap Analysis
+                        </button>
+                        <div id="keywordGapResults" class="mt-2 small"></div>
+                        <button class="btn btn-warning btn-sm w-100 mt-2" onclick="calculateATS()">
+                            <i class="bi bi-arrow-repeat me-1"></i> Re-analyze ATS Score
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Live Preview -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <div class="btn-group btn-group-sm me-2">
+                    <button class="btn btn-outline-secondary active" id="previewModeResume" onclick="setPreviewMode('resume')">
+                        <i class="bi bi-file-earmark-person"></i> Resume
+                    </button>
+                    <button class="btn btn-outline-secondary" id="previewModeCover" onclick="setPreviewMode('coverletter')">
+                        <i class="bi bi-envelope-paper"></i> Cover Letter
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-info" onclick="editCoverLetter()" title="Edit Cover Letter">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleEditor()" title="Toggle Editor">
+                        <i class="bi bi-layout-sidebar"></i>
+                    </button>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active" onclick="setZoom('fit')" id="zoomFit">Fit</button>
+                        <button class="btn btn-outline-secondary" onclick="setZoom('100')" id="zoom100">100%</button>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-wrapper" id="previewWrapper">
+                <div class="resume-page" id="resumePage">
+                    <!-- Resume content rendered here by JavaScript -->
+                    <div class="resume-empty-state" id="resumeEmpty">
+                        <i class="bi bi-file-earmark-person" style="font-size: 3rem; color: #666;"></i>
+                        <h5 class="mt-3 text-muted">Your Resume Preview</h5>
+                        <p class="text-muted small">Start filling in the form on the left to see your resume come alive!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast align-items-center border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body" id="toastBody"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== AI CHATBOT ==================== -->
+    <!-- Floating chat button -->
+    <div id="chatButton" class="chat-button" data-bs-toggle="modal" data-bs-target="#chatModal">
+        <i class="bi bi-chat-dots-fill"></i>
+    </div>
+
+    <!-- Chat Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-sm">
+            <div class="modal-content chat-modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title">
+                        <i class="bi bi-robot text-warning me-2"></i>Resume Assistant
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-message assistant">
+                            <div class="message-bubble">Hello! I'm your resume assistant. Ask me anything about resume writing, tailoring your resume for a job, or get personalized suggestions based on your current resume data.</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container mt-3">
+                        <div class="input-group">
+                            <input type="text" id="chatInput" class="form-control form-control-sm" placeholder="Type your message..." aria-label="Chat message">
+                            <button class="btn btn-warning btn-sm" id="sendChatBtn" onclick="sendChatMessage()">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <small class="text-muted">Powered by Claude AI</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="coverLetterEditModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content login-modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Cover Letter</h6>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="coverLetterEditor" class="form-control" rows="12" style="font-family: monospace;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-outline-danger" onclick="dismissCoverLetterChanges()">Dismiss</button>
+                <button class="btn btn-warning" onclick="acceptCoverLetterChanges()">Accept Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="js/ai-suggestions.js"></script>
+    <script src="js/chatbot.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
+  
