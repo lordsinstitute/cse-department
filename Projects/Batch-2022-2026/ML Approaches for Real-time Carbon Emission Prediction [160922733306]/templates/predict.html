@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Predict — Carbon Emission Prediction{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-card {
+        border-radius: 12px; padding: 2rem; text-align: center;
+        background: rgba(255,255,255,0.04);
+    }
+    .co2-value { font-size: 3rem; font-weight: 800; }
+    .co2-unit { font-size: 1.2rem; color: #aaa; }
+    .confidence-range { font-size: 0.9rem; color: #aaa; margin-top: 0.3rem; }
+    .rating-badge {
+        font-size: 1.5rem; padding: 0.5rem 1.5rem;
+        border-radius: 50px; font-weight: 700; display: inline-block;
+    }
+    .input-summary { font-size: 0.85rem; }
+    .input-summary td { padding: 0.3rem 0.5rem; }
+    .rec-item { padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem; }
+    .rec-item:last-child { border-bottom: none; }
+    .warning-box { background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 8px; padding: 0.8rem; margin-bottom: 1rem; }
+    .warning-box li { font-size: 0.85rem; color: #eab308; }
+    .footprint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .footprint-card { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 1rem; text-align: center; }
+    .footprint-card h4 { color: #10b981; font-weight: 700; margin: 0; font-size: 1.3rem; }
+    .footprint-card p { margin: 0.2rem 0 0; font-size: 0.8rem; color: #aaa; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-calculator"></i> Predict CO2 Emissions</h2>
+<p class="text-muted mb-4">Enter vehicle specifications to predict carbon dioxide emissions (g/km) using our trained ML model.</p>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-sliders"></i> Vehicle Specifications</div>
+            <div class="card-body">
+                <form method="POST" id="predictForm">
+                    {% for col, options in categorical_options.items() %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ col.replace('_', ' ') }}</label>
+                        <select name="{{ col }}" class="form-select" id="field_{{ col }}" required
+                                {% if col == 'Fuel_Type' %}onchange="onFuelTypeChange(this.value)"{% endif %}
+                                {% if col == 'Vehicle_Class' %}onchange="onClassChange(this.value)"{% endif %}>
+                            {% for opt in options %}
+                            <option value="{{ opt }}" {% if result and result.input[col] == opt %}selected{% endif %}>
+                                {{ opt }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endfor %}
+
+                    {% for col, cfg in numeric_ranges.items() %}
+                    <div class="mb-3" id="group_{{ col }}">
+                        <label class="form-label">
+                            {{ col.replace('_', ' ') }}
+                            {% if cfg.unit %}<small class="text-muted">({{ cfg.unit }})</small>{% endif %}
+                        </label>
+                        <input type="number" name="{{ col }}" class="form-control" id="field_{{ col }}"
+                               min="{{ cfg.min }}" max="{{ cfg.max }}" step="{{ cfg.step }}"
+                               value="{{ result.input[col] if result else cfg.default }}" required>
+                    </div>
+                    {% endfor %}
+
+                    <div id="validationWarnings" style="display:none;" class="warning-box">
+                        <small class="text-warning fw-bold"><i class="bi bi-exclamation-triangle"></i> Input Warnings:</small>
+                        <ul class="mb-0 mt-1" id="warningList"></ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="bi bi-cloud-haze2"></i> Predict CO2 Emissions
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if result %}
+
+        {% if result.warnings %}
+        <div class="warning-box mb-3">
+            <small class="text-warning fw-bold"><i class="bi bi-exclamation-triangle"></i> Input Warnings:</small>
+            <ul class="mb-0 mt-1">
+                {% for w in result.warnings %}
+                <li>{{ w }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="card" style="border-left: 4px solid {{ result.color }};">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clipboard2-pulse"></i> Prediction Result</span>
+                <span class="badge" style="background: {{ result.color }};">
+                    {{ result.label }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="result-card mb-4">
+                    {% if result.input.Fuel_Type == 'Electric' %}
+                    <div class="co2-value" style="color: #22c55e;">0.0</div>
+                    <div class="co2-unit">grams CO2 per kilometer</div>
+                    <div class="confidence-range">Zero tailpipe emissions</div>
+                    {% else %}
+                    <div class="co2-value" style="color: {{ result.color }};">
+                        {{ result.co2 }}
+                    </div>
+                    <div class="co2-unit">grams CO2 per kilometer</div>
+                    {% if result.conf_low != result.conf_high %}
+                    <div class="confidence-range">
+                        <i class="bi bi-arrow-left-right"></i>
+                        90% Confidence: {{ result.conf_low }} — {{ result.conf_high }} g/km
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <div class="mt-3">
+                        <span class="rating-badge" style="background: {{ result.color }}; color: white;">
+                            Rating: {{ result.rating }}/10
+                        </span>
+                    </div>
+                    <div class="mt-2">
+                        <span style="color: {{ result.color }}; font-weight: 600; font-size: 1.1rem;">
+                            {{ result.label }} Emissions
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Carbon Footprint -->
+                <h6 class="text-emerald mb-3"><i class="bi bi-globe"></i> Annual Carbon Footprint <small class="text-muted">(15,000 km/year)</small></h6>
+                <div class="footprint-grid mb-4">
+                    <div class="footprint-card">
+                        <h4>{{ result.footprint.annual_tonnes }}</h4>
+                        <p>Tonnes CO2 / Year</p>
+                    </div>
+                    <div class="footprint-card">
+                        <h4>{{ result.footprint.monthly_kg }}</h4>
+                        <p>kg CO2 / Month</p>
+                    </div>
+                    <div class="footprint-card">
+                        <h4>{{ result.footprint.trees_needed }}</h4>
+                        <p>Trees to Offset</p>
+                    </div>
+                    <div class="footprint-card">
+                        <h4>{{ result.footprint.annual_kg }}</h4>
+                        <p>kg CO2 / Year</p>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                {% if result.recommendations %}
+                <h6 class="text-emerald mb-2"><i class="bi bi-lightbulb"></i> Recommendations</h6>
+                <div class="mb-4">
+                    {% for rec in result.recommendations %}
+                    <div class="rec-item"><i class="bi bi-check-circle text-emerald me-2"></i>{{ rec }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <h6 class="text-emerald mb-3"><i class="bi bi-card-list"></i> Vehicle Summary</h6>
+                <table class="table table-sm input-summary">
+                    <tbody>
+                        {% for key, val in result.input.items() %}
+                        <tr>
+                            <td class="text-muted">{{ key.replace('_', ' ') }}</td>
+                            <td class="fw-bold">
+                                {{ val }}
+                                {% if key == 'Engine_Size' %} L
+                                {% elif key == 'Vehicle_Weight' %} kg
+                                {% elif 'Fuel_Consumption' in key %} L/100km
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="mt-3 text-center">
+                    <small class="text-muted">
+                        Predicted on {{ now }} | Model: {{ models_info_name }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-cloud-haze2 text-emerald" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-emerald">Enter Vehicle Specifications</h4>
+                <p class="text-muted">Fill in the form on the left and click "Predict" to estimate CO2 emissions for any vehicle configuration.</p>
+                <div class="mt-4">
+                    <div class="row g-3">
+                        <div class="col-3">
+                            <div class="stat-card">
+                                <h5 class="text-emerald">11 Features</h5>
+                                <p>Input Parameters</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="stat-card">
+                                <h5 class="text-emerald">6 Models</h5>
+                                <p>Compared</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="stat-card">
+                                <h5 class="text-emerald">EV/Hybrid</h5>
+                                <p>Supported</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="stat-card">
+                                <h5 class="text-emerald">90% CI</h5>
+                                <p>Confidence</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const constraints = {{ class_constraints|safe }};
+
+    function onFuelTypeChange(fuel) {
+        const isElectric = fuel === 'Electric';
+        const fields = ['Engine_Size', 'Cylinders', 'Fuel_Consumption_City', 'Fuel_Consumption_Hwy', 'Fuel_Consumption_Comb'];
+        fields.forEach(f => {
+            const el = document.getElementById('field_' + f);
+            if (isElectric) {
+                el.value = '0';
+                el.setAttribute('readonly', true);
+                el.style.opacity = '0.5';
+            } else {
+                el.removeAttribute('readonly');
+                el.style.opacity = '1';
+            }
+        });
+        if (isElectric) {
+            document.getElementById('field_Vehicle_Weight').value =
+                parseInt(document.getElementById('field_Vehicle_Weight').value || 1400) + 200;
+        }
+    }
+
+    function onClassChange(vclass) {
+        const c = constraints[vclass];
+        if (!c) return;
+        const fuel = document.getElementById('field_Fuel_Type').value;
+        if (fuel === 'Electric') return;
+        // Suggest midpoint values
+        document.getElementById('field_Engine_Size').value = ((c.engine[0] + c.engine[1]) / 2).toFixed(1);
+        document.getElementById('field_Cylinders').value = Math.round((c.cyl[0] + c.cyl[1]) / 2);
+        document.getElementById('field_Vehicle_Weight').value = Math.round((c.weight[0] + c.weight[1]) / 2);
+    }
+
+    // Apply initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        const fuel = document.getElementById('field_Fuel_Type').value;
+        if (fuel === 'Electric') onFuelTypeChange('Electric');
+    });
+</script>
+{% endblock %}
