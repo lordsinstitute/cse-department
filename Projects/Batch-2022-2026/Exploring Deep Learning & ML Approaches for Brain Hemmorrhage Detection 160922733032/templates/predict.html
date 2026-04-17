@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-3">
+    <h2 class="fw-bold mb-1"><i class="bi bi-upload"></i> Analyze Brain CT Scan</h2>
+    <p class="text-muted">Upload a brain CT image to detect hemorrhage using our CNN model</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card p-4 mb-4">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-area mb-3" id="dropZone">
+                        <i class="bi bi-cloud-upload" style="font-size:3rem;color:#58a6ff;"></i>
+                        <h5 class="mt-2">Upload Brain CT Image</h5>
+                        <p class="text-muted mb-2">Drag & drop or click to select</p>
+                        <input type="file" name="ct_image" id="ctImage" class="form-control" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" required>
+                        <small class="text-muted">Supported: PNG, JPG, JPEG, BMP, TIF</small>
+                    </div>
+                    <div id="previewBox" class="text-center mb-3" style="display:none;">
+                        <img id="imagePreview" class="ct-preview">
+                    </div>
+                    <button type="submit" class="btn btn-scan w-100 btn-lg">
+                        <i class="bi bi-cpu"></i> Analyze Image
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {% if result %}
+            <div class="card p-4 {{ 'result-hemorrhage' if result.is_hemorrhage else 'result-normal' }}">
+                <h4 class="text-center mb-3">Analysis Result</h4>
+
+                <div class="text-center mb-3">
+                    <img src="/{{ result.image }}" class="ct-preview">
+                </div>
+
+                <div class="text-center mb-3">
+                    <span class="badge {{ 'badge-hemorrhage' if result.is_hemorrhage else 'badge-normal' }} fs-5 px-4 py-2">
+                        {% if result.is_hemorrhage %}
+                            <i class="bi bi-exclamation-triangle"></i> {{ result.prediction }}
+                        {% else %}
+                            <i class="bi bi-check-circle"></i> {{ result.prediction }}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="text-center">
+                    <h5>Confidence: <span style="color: {% if result.confidence >= 80 %}#3fb950{% elif result.confidence >= 60 %}#d29922{% else %}#f85149{% endif %};">{{ result.confidence }}%</span></h5>
+                </div>
+
+                <div class="mt-3 p-3" style="background:#0d1117;border-radius:8px;">
+                    {% if result.is_hemorrhage %}
+                    <p class="mb-1"><strong style="color:#f85149;">Warning:</strong> Potential brain hemorrhage detected in the CT scan.</p>
+                    <p class="mb-0 text-muted"><small>This is an AI-assisted analysis. Please consult a medical professional for clinical diagnosis and treatment.</small></p>
+                    {% else %}
+                    <p class="mb-1"><strong style="color:#3fb950;">Result:</strong> No hemorrhage patterns detected in the CT scan.</p>
+                    <p class="mb-0 text-muted"><small>This is an AI-assisted analysis. Regular check-ups are still recommended.</small></p>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="card p-4">
+                <h5 class="text-info mb-3">How It Works</h5>
+                <div class="mb-3">
+                    <strong style="color:#e63946;">1. Upload</strong><br>
+                    <small>Select a brain CT scan image (grayscale recommended)</small>
+                </div>
+                <div class="mb-3">
+                    <strong style="color:#e63946;">2. Process</strong><br>
+                    <small>Our CNN model analyzes the image for hemorrhage patterns</small>
+                </div>
+                <div class="mb-3">
+                    <strong style="color:#e63946;">3. Result</strong><br>
+                    <small>Get instant prediction with confidence score</small>
+                </div>
+                <hr>
+                <h6 class="text-info">Detectable Hemorrhage Types</h6>
+                <ul class="list-unstyled">
+                    <li><small><i class="bi bi-dot"></i> Subdural hemorrhage</small></li>
+                    <li><small><i class="bi bi-dot"></i> Intracerebral hemorrhage</small></li>
+                    <li><small><i class="bi bi-dot"></i> Subarachnoid hemorrhage</small></li>
+                </ul>
+                <p class="text-muted"><small>Download test samples from the Home page to try it out.</small></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('ctImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('imagePreview').src = ev.target.result;
+                document.getElementById('previewBox').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}
