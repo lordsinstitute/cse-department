@@ -1,0 +1,90 @@
+{
+  "models": {
+    "Random Forest": {
+      "accuracy": 90.1,
+      "precision": 86.43,
+      "recall": 73.46,
+      "f1": 79.42,
+      "confusion_matrix": [
+        [
+          1420,
+          60
+        ],
+        [
+          138,
+          382
+        ]
+      ]
+    },
+    "Gradient Boosting": {
+      "accuracy": 91.95,
+      "precision": 89.45,
+      "recall": 78.27,
+      "f1": 83.49,
+      "confusion_matrix": [
+        [
+          1432,
+          48
+        ],
+        [
+          113,
+          407
+        ]
+      ]
+    },
+    "SVM": {
+      "accuracy": 91.1,
+      "precision": 85.62,
+      "recall": 79.04,
+      "f1": 82.2,
+      "confusion_matrix": [
+        [
+          1411,
+          69
+        ],
+        [
+          109,
+          411
+        ]
+      ]
+    },
+    "Logistic Regression": {
+      "accuracy": 90.25,
+      "precision": 83.92,
+      "recall": 77.31,
+      "f1": 80.48,
+      "confusion_matrix": [
+        [
+          1403,
+          77
+        ],
+        [
+          118,
+          402
+        ]
+      ]
+    }
+  },
+  "best_model": "Gradient Boosting",
+  "features": [
+    "AGE",
+    "GENDER",
+    "RACE",
+    "DRIVING_EXPERIENCE",
+    "EDUCATION",
+    "INCOME",
+    "CREDIT_SCORE",
+    "VEHICLE_OWNERSHIP",
+    "VEHICLE_YEAR",
+    "MARRIED",
+    "CHILDREN",
+    "POSTAL_CODE",
+    "ANNUAL_MILEAGE",
+    "VEHICLE_TYPE",
+    "SPEEDING_VIOLATIONS",
+    "DUIS",
+    "PAST_ACCIDENTS"
+  ],
+  "test_size": 2000,
+  "train_size": 8000
+}

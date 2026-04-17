@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}About - Insurance Claim Predictor{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> About This Project</h2>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card p-4 h-100">
+            <h5><i class="bi bi-file-text"></i> Project Overview</h5>
+            <hr>
+            <p>This project uses <strong>Machine Learning</strong> to predict whether a car insurance customer will file a claim based on their profile data.</p>
+            <p>The system analyzes 17 features including age, driving experience, vehicle type, credit score, and violation history to classify customers as <strong>Claim Likely</strong> or <strong>No Claim Expected</strong>.</p>
+            <p>This helps insurance companies in:</p>
+            <ul>
+                <li>Risk assessment and premium calculation</li>
+                <li>Identifying high-risk customers</li>
+                <li>Fraud detection support</li>
+                <li>Policy underwriting decisions</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-4 h-100">
+            <h5><i class="bi bi-database"></i> Dataset Features (17)</h5>
+            <hr>
+            <div class="table-responsive">
+                <table class="table table-dark table-sm">
+                    <thead><tr><th>Feature</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td>AGE</td><td>Categorical</td><td>Age group (16-25, 26-39, 40-64, 65+)</td></tr>
+                        <tr><td>GENDER</td><td>Categorical</td><td>Male / Female</td></tr>
+                        <tr><td>RACE</td><td>Categorical</td><td>Majority / Minority</td></tr>
+                        <tr><td>DRIVING_EXPERIENCE</td><td>Categorical</td><td>Years of driving (0-9y to 30y+)</td></tr>
+                        <tr><td>EDUCATION</td><td>Categorical</td><td>None / High School / University</td></tr>
+                        <tr><td>INCOME</td><td>Categorical</td><td>Poverty to Upper Class</td></tr>
+                        <tr><td>CREDIT_SCORE</td><td>Numeric</td><td>0.0 to 1.0</td></tr>
+                        <tr><td>VEHICLE_OWNERSHIP</td><td>Binary</td><td>0 = No, 1 = Yes</td></tr>
+                        <tr><td>VEHICLE_YEAR</td><td>Categorical</td><td>Before/After 2015</td></tr>
+                        <tr><td>MARRIED</td><td>Binary</td><td>0 = No, 1 = Yes</td></tr>
+                        <tr><td>CHILDREN</td><td>Binary</td><td>0 = No, 1 = Yes</td></tr>
+                        <tr><td>POSTAL_CODE</td><td>Numeric</td><td>Area postal code</td></tr>
+                        <tr><td>ANNUAL_MILEAGE</td><td>Numeric</td><td>Yearly kilometers driven</td></tr>
+                        <tr><td>VEHICLE_TYPE</td><td>Categorical</td><td>Sedan / Sports Car</td></tr>
+                        <tr><td>SPEEDING_VIOLATIONS</td><td>Numeric</td><td>Count (0-5)</td></tr>
+                        <tr><td>DUIS</td><td>Numeric</td><td>DUI incidents (0-3)</td></tr>
+                        <tr><td>PAST_ACCIDENTS</td><td>Numeric</td><td>Count (0-5)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Models -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card p-4 h-100">
+            <h5><i class="bi bi-cpu"></i> ML Models Used</h5>
+            <hr>
+            {% if models_info and models_info.get('models') %}
+            {% for name, m in models_info['models'].items() %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ name }}</strong>
+                    <span>{{ m['accuracy'] }}%</span>
+                </div>
+                <div class="progress" style="height: 22px;">
+                    <div class="progress-bar {% if name == models_info.get('best_model') %}bg-success{% else %}bg-info{% endif %}"
+                         style="width: {{ m['accuracy'] }}%">{{ m['accuracy'] }}%</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-muted">Run <code>train_model.py</code> to see model performance.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-4 h-100">
+            <h5><i class="bi bi-stack"></i> Technology Stack</h5>
+            <hr>
+            <table class="table table-dark table-sm">
+                <tbody>
+                    <tr><td><strong>Backend</strong></td><td>Python, Flask</td></tr>
+                    <tr><td><strong>ML Models</strong></td><td>Random Forest, Gradient Boosting, SVM, Logistic Regression</td></tr>
+                    <tr><td><strong>ML Library</strong></td><td>scikit-learn</td></tr>
+                    <tr><td><strong>Data Analysis</strong></td><td>Pandas, NumPy</td></tr>
+                    <tr><td><strong>Visualization</strong></td><td>Matplotlib, Seaborn, Chart.js</td></tr>
+                    <tr><td><strong>Database</strong></td><td>SQLite</td></tr>
+                    <tr><td><strong>Frontend</strong></td><td>HTML, Bootstrap 5 (Dark Theme)</td></tr>
+                    <tr><td><strong>Security</strong></td><td>Werkzeug (Password Hashing)</td></tr>
+                </tbody>
+            </table>
+
+            <h6 class="mt-3">How Prediction Works:</h6>
+            <ol class="small text-muted">
+                <li>User enters 17 customer features</li>
+                <li>Categorical values are label-encoded</li>
+                <li>Feature vector passed to trained ML model</li>
+                <li>Model outputs probability of claim (0-1)</li>
+                <li>Result displayed with confidence percentage</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
