@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Detect URL{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-search text-warning me-2"></i>URL Malicious Detection</h3>
+
+<div class="row g-4">
+    <!-- Input Form -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Enter URL to Analyze</h6></div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="text" class="form-control form-control-lg" name="url"
+                               placeholder="e.g. https://example.com/page" required
+                               value="{{ result.url if result else '' }}">
+                        <div class="form-text">Enter a complete URL including http:// or https://</div>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-lg w-100">
+                        <i class="bi bi-shield-check me-2"></i>Analyze URL
+                    </button>
+                </form>
+
+                <div class="mt-4">
+                    <h6 class="text-muted mb-2">Quick Test URLs:</h6>
+                    <div class="d-flex flex-column gap-1">
+                        <small class="text-success"><i class="bi bi-check-circle me-1"></i>https://www.google.com/search?q=python</small>
+                        <small class="text-success"><i class="bi bi-check-circle me-1"></i>https://github.com/trending</small>
+                        <small class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>http://192.168.1.1/login/verify/account</small>
+                        <small class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>http://secure-login-verify.tk/account/password</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result -->
+    <div class="col-md-6">
+        {% if result %}
+        <div class="card border-{{ 'danger' if result.prediction == 'Malicious' else 'success' }}">
+            <div class="card-header bg-{{ 'danger' if result.prediction == 'Malicious' else 'success' }}">
+                <h6 class="mb-0 text-{{ 'white' if result.prediction == 'Malicious' else 'dark' }}">
+                    {% if result.prediction == 'Malicious' %}
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>WARNING: Malicious URL Detected!
+                    {% else %}
+                    <i class="bi bi-check-circle-fill me-2"></i>URL Appears Legitimate
+                    {% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-6 fw-bold text-{{ 'danger' if result.prediction == 'Malicious' else 'success' }}">
+                        {{ result.prediction }}
+                    </div>
+                    <div class="text-muted">Confidence: <strong>{{ result.confidence }}%</strong></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Analyzed URL</label>
+                    <div class="bg-dark p-2 rounded small text-break">{{ result.url }}</div>
+                </div>
+
+                <h6 class="text-warning mt-3 mb-2"><i class="bi bi-clipboard-data me-2"></i>Extracted Features</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                        {% for key, value in result.features.items() %}
+                        <tr>
+                            <td class="text-muted small">{{ key }}</td>
+                            <td class="fw-bold small">
+                                {% if value == 'Yes' %}<span class="text-warning">{{ value }}</span>
+                                {% elif value == 'No' %}<span class="text-muted">{{ value }}</span>
+                                {% else %}{{ value }}{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-shield-check" style="font-size: 4rem; color: #444;"></i>
+                <h5 class="mt-3 text-muted">Enter a URL to analyze</h5>
+                <p class="text-muted small">The ML model will extract 28 features from the URL and predict whether it's safe or malicious.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

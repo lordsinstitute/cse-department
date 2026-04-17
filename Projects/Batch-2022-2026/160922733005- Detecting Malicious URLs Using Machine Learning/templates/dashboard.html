@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-speedometer2 text-warning me-2"></i>Model Performance Dashboard</h3>
+
+<!-- Model Comparison Table -->
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="bi bi-table me-2"></i>Model Comparison</h6></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th></tr>
+                </thead>
+                <tbody>
+                {% for name, m in models_info.models.items()|sort(attribute='1.accuracy', reverse=True) %}
+                <tr class="{{ 'table-warning' if name == models_info.best_model else '' }}">
+                    <td>
+                        {{ name }}
+                        {% if name == models_info.best_model %}
+                        <span class="badge bg-warning text-dark ms-2"><i class="bi bi-star-fill me-1"></i>Best</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ m.accuracy }}%</td>
+                    <td>{{ m.precision }}%</td>
+                    <td>{{ m.recall }}%</td>
+                    <td>{{ m.f1 }}%</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Accuracy Comparison</h6></div>
+            <div class="card-body"><canvas id="accChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">F1 Score Comparison</h6></div>
+            <div class="card-body"><canvas id="f1Chart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Precision vs Recall</h6></div>
+            <div class="card-body"><canvas id="prChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Overall Performance Radar</h6></div>
+            <div class="card-body"><canvas id="radarChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ models_info.train_size }}</div>
+            <div class="stat-label">Training Samples</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ models_info.test_size }}</div>
+            <div class="stat-label">Test Samples</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ models_info.features|length }}</div>
+            <div class="stat-label">URL Features</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+const models = {{ models_info.models | tojson }};
+const names = Object.keys(models).sort((a,b) => models[b].accuracy - models[a].accuracy);
+const accs = names.map(n => models[n].accuracy);
+const f1s = names.map(n => models[n].f1);
+const precs = names.map(n => models[n].precision);
+const recs = names.map(n => models[n].recall);
+const colors = names.map(n => n === '{{ models_info.best_model }}' ? '#ffc107' : '#6c757d');
+
+const chartOpts = { responsive: true, plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: false, min: 50, grid: { color: '#333' } }, x: { grid: { color: '#333' },
+    ticks: { maxRotation: 45, font: { size: 10 } } } } };
+
+new Chart(document.getElementById('accChart'), {
+    type: 'bar', data: { labels: names, datasets: [{ label: 'Accuracy %', data: accs, backgroundColor: colors }] },
+    options: chartOpts
+});
+
+new Chart(document.getElementById('f1Chart'), {
+    type: 'bar', data: { labels: names, datasets: [{ label: 'F1 Score %', data: f1s, backgroundColor: colors }] },
+    options: chartOpts
+});
+
+new Chart(document.getElementById('prChart'), {
+    type: 'bar', data: { labels: names, datasets: [
+        { label: 'Precision %', data: precs, backgroundColor: '#3498db' },
+        { label: 'Recall %', data: recs, backgroundColor: '#e74c3c' }
+    ] }, options: { responsive: true, scales: { y: { beginAtZero: false, min: 50, grid: { color: '#333' } },
+    x: { grid: { color: '#333' }, ticks: { maxRotation: 45, font: { size: 10 } } } } }
+});
+
+// Radar for best model
+const best = '{{ models_info.best_model }}';
+const bm = models[best];
+new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+        labels: ['Accuracy', 'Precision', 'Recall', 'F1 Score'],
+        datasets: [{
+            label: best, data: [bm.accuracy, bm.precision, bm.recall, bm.f1],
+            backgroundColor: 'rgba(255, 193, 7, 0.2)', borderColor: '#ffc107', borderWidth: 2, pointBackgroundColor: '#ffc107'
+        }]
+    },
+    options: { responsive: true, scales: { r: { beginAtZero: false, min: 50, grid: { color: '#333' },
+        angleLines: { color: '#333' }, pointLabels: { color: '#ccc' } } } }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Visualize{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-bar-chart text-warning me-2"></i>Data Visualizations (EDA)</h3>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">URL Distribution</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/label_dist.png') }}" class="img-fluid rounded" alt="Label Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">URL Length Distribution</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/url_length.png') }}" class="img-fluid rounded" alt="URL Length">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Protocol (HTTP vs HTTPS)</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/https_dist.png') }}" class="img-fluid rounded" alt="HTTPS Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">IP Address in URL</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/ip_dist.png') }}" class="img-fluid rounded" alt="IP Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Suspicious Words Count</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/suspicious_words.png') }}" class="img-fluid rounded" alt="Suspicious Words">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Domain Length Distribution</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/domain_length.png') }}" class="img-fluid rounded" alt="Domain Length">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Number of Subdomains</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/subdomains.png') }}" class="img-fluid rounded" alt="Subdomains">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Special Character Ratio</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/special_ratio.png') }}" class="img-fluid rounded" alt="Special Ratio">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">URL Path Depth</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/url_depth.png') }}" class="img-fluid rounded" alt="URL Depth">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Feature Correlation Heatmap</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/correlation.png') }}" class="img-fluid rounded" alt="Correlation">
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Feature Importance (Random Forest)</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/feature_importance.png') }}" class="img-fluid rounded" alt="Feature Importance">
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Confusion Matrix (Best Model)</h6></div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/confusion_matrix.png') }}" class="img-fluid rounded" style="max-width: 500px;" alt="Confusion Matrix">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

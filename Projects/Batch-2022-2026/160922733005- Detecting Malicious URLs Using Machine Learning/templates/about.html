@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-info-circle text-warning me-2"></i>About URLShield</h3>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header"><h6 class="mb-0">Project Overview</h6></div>
+            <div class="card-body">
+                <p><strong>URLShield</strong> is a machine learning-based web application that detects malicious (phishing/harmful) URLs.
+                Users enter a URL and the system extracts 28 numerical features from it, then uses a trained ML model to classify it as
+                <span class="text-success">Legitimate</span> or <span class="text-danger">Malicious</span>.</p>
+                <p>The project compares 8 different ML algorithms and uses the best-performing model for real-time predictions.</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><h6 class="mb-0">How It Works</h6></div>
+            <div class="card-body">
+                <div class="row text-center g-3">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-link-45deg text-warning" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0 small"><strong>1. Enter URL</strong></p>
+                            <p class="text-muted small mb-0">User submits a URL</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-clipboard-data text-warning" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0 small"><strong>2. Extract Features</strong></p>
+                            <p class="text-muted small mb-0">28 features extracted</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-cpu text-warning" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0 small"><strong>3. ML Prediction</strong></p>
+                            <p class="text-muted small mb-0">Model classifies URL</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-shield-check text-warning" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0 small"><strong>4. Show Result</strong></p>
+                            <p class="text-muted small mb-0">Safe or malicious</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><h6 class="mb-0">28 URL Features Extracted</h6></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>#</th><th>Feature</th><th>Description</th></tr></thead>
+                        <tbody>
+                        {% set features = [
+                            ('url_length', 'Total length of the URL string'),
+                            ('n_dots', 'Number of dot characters'),
+                            ('n_hyphens', 'Number of hyphen characters'),
+                            ('n_underscores', 'Number of underscore characters'),
+                            ('n_slashes', 'Number of forward slash characters'),
+                            ('n_question_marks', 'Number of question mark characters'),
+                            ('n_equal', 'Number of equal sign characters'),
+                            ('n_at', 'Number of @ symbols'),
+                            ('n_ampersand', 'Number of & characters'),
+                            ('n_percent', 'Number of % (encoding) characters'),
+                            ('n_digits', 'Count of digit characters (0-9)'),
+                            ('n_letters', 'Count of letter characters (a-z, A-Z)'),
+                            ('n_special', 'Count of non-alphanumeric characters'),
+                            ('has_https', 'Whether URL uses HTTPS protocol'),
+                            ('has_ip', 'Whether URL contains an IP address'),
+                            ('domain_length', 'Length of the domain name'),
+                            ('n_subdomains', 'Number of subdomain levels'),
+                            ('path_length', 'Length of the URL path'),
+                            ('url_depth', 'Number of path segments (directories)'),
+                            ('has_at_symbol', 'Presence of @ symbol (redirect trick)'),
+                            ('double_slash_redirect', 'Multiple // found (redirect trick)'),
+                            ('prefix_suffix', 'Hyphen in domain (suspicious pattern)'),
+                            ('n_suspicious_words', 'Count of phishing keywords (login, verify, etc.)'),
+                            ('is_shortened', 'URL uses a shortener service (bit.ly, etc.)'),
+                            ('suspicious_tld', 'Uses a suspicious TLD (.tk, .xyz, etc.)'),
+                            ('digit_ratio', 'Ratio of digits to total characters'),
+                            ('letter_ratio', 'Ratio of letters to total characters'),
+                            ('special_ratio', 'Ratio of special characters to total')
+                        ] %}
+                        {% for name, desc in features %}
+                        <tr><td class="text-muted">{{ loop.index }}</td><td><code>{{ name }}</code></td><td class="small">{{ desc }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header"><h6 class="mb-0">Best Model</h6></div>
+            <div class="card-body text-center">
+                <h4 class="text-warning">{{ models_info.best_model }}</h4>
+                <p class="display-5 fw-bold text-success">{{ models_info.models[models_info.best_model].accuracy }}%</p>
+                <p class="text-muted">Accuracy on test set</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><h6 class="mb-0">Tech Stack</h6></div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-filetype-py text-warning me-2"></i><strong>Python 3</strong> — Programming language</li>
+                    <li class="mb-2"><i class="bi bi-box text-warning me-2"></i><strong>Flask</strong> — Web framework</li>
+                    <li class="mb-2"><i class="bi bi-cpu text-warning me-2"></i><strong>scikit-learn</strong> — ML library</li>
+                    <li class="mb-2"><i class="bi bi-table text-warning me-2"></i><strong>pandas</strong> — Data handling</li>
+                    <li class="mb-2"><i class="bi bi-bar-chart text-warning me-2"></i><strong>matplotlib</strong> — Visualizations</li>
+                    <li class="mb-2"><i class="bi bi-palette text-warning me-2"></i><strong>seaborn</strong> — Statistical plots</li>
+                    <li class="mb-2"><i class="bi bi-database text-warning me-2"></i><strong>SQLite</strong> — Database</li>
+                    <li class="mb-2"><i class="bi bi-bootstrap text-warning me-2"></i><strong>Bootstrap 5</strong> — Dark theme UI</li>
+                    <li class="mb-0"><i class="bi bi-graph-up text-warning me-2"></i><strong>Chart.js</strong> — Dashboard charts</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">ML Models Compared</h6></div>
+            <div class="card-body">
+                <ol class="mb-0 small">
+                    <li>Logistic Regression</li>
+                    <li>K-Nearest Neighbors</li>
+                    <li>Support Vector Machine</li>
+                    <li>Naive Bayes</li>
+                    <li>Decision Tree</li>
+                    <li>Random Forest</li>
+                    <li>Gradient Boosting</li>
+                    <li>MLP Neural Network</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
