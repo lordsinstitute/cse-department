@@ -1,0 +1,73 @@
+{
+  "models": {
+    "CNN (Deep Learning)": {
+      "accuracy": 99.5,
+      "precision": 99.01,
+      "recall": 100.0,
+      "f1": 99.5,
+      "confusion_matrix": [
+        [
+          99,
+          1
+        ],
+        [
+          0,
+          100
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 92.0,
+      "precision": 87.5,
+      "recall": 98.0,
+      "f1": 92.45,
+      "confusion_matrix": [
+        [
+          86,
+          14
+        ],
+        [
+          2,
+          98
+        ]
+      ]
+    },
+    "SVM": {
+      "accuracy": 86.5,
+      "precision": 79.2,
+      "recall": 99.0,
+      "f1": 88.0,
+      "confusion_matrix": [
+        [
+          74,
+          26
+        ],
+        [
+          1,
+          99
+        ]
+      ]
+    },
+    "Logistic Regression": {
+      "accuracy": 76.5,
+      "precision": 71.54,
+      "recall": 88.0,
+      "f1": 78.92,
+      "confusion_matrix": [
+        [
+          65,
+          35
+        ],
+        [
+          12,
+          88
+        ]
+      ]
+    }
+  },
+  "class_to_idx": {
+    "hemorrhage": 0,
+    "normal": 1
+  },
+  "img_size": 128
+}

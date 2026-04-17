@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-3">
+    <h2 class="fw-bold mb-1">Welcome, {{ session.get('name') }}</h2>
+    <p class="text-muted">Brain Hemorrhage Detection using Deep Learning & Machine Learning</p>
+
+    <div class="row mb-4 mt-4">
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ total_scans }}</h2>
+                <p>Total Scans</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2 style="color: #f85149;">{{ hemorrhage_count }}</h2>
+                <p>Hemorrhage Detected</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2 style="color: #3fb950;">{{ normal_count }}</h2>
+                <p>Normal Scans</p>
+            </div>
+        </div>
+    </div>
+
+    {% if admin_stats %}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ admin_stats.total_users }}</h2>
+                <p>Registered Users</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ admin_stats.total_scans }}</h2>
+                <p>Total Scans (All Users)</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2 style="color: #f85149;">{{ admin_stats.total_hemorrhage }}</h2>
+                <p>Total Hemorrhages Found</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <a href="/predict" class="card p-4 text-center text-decoration-none text-white d-block">
+                <h3 class="mb-2" style="color:#e63946;"><i class="bi bi-upload"></i> Analyze CT Scan</h3>
+                <p class="mb-0">Upload a brain CT image for hemorrhage detection</p>
+            </a>
+        </div>
+        <div class="col-md-6 mb-3">
+            <a href="/history" class="card p-4 text-center text-decoration-none text-white d-block">
+                <h3 class="mb-2" style="color:#e63946;"><i class="bi bi-clock-history"></i> Scan History</h3>
+                <p class="mb-0">View all your past analysis results</p>
+            </a>
+        </div>
+    </div>
+
+    {% if recent %}
+    <h5 class="text-info mb-3">Recent Analyses</h5>
+    {% for p in recent %}
+    <div class="card p-3 mb-2 {{ 'result-hemorrhage' if 'Hemorrhage' in p.prediction else 'result-normal' }}">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                <img src="/{{ p.image_path }}" class="rounded" style="max-height:60px;">
+            </div>
+            <div class="col-md-4">
+                <strong>{{ p.prediction }}</strong><br>
+                <small class="text-muted">Confidence: {{ p.confidence }}%</small>
+            </div>
+            <div class="col-md-3 text-center">
+                <small class="text-muted">{{ p.scan_date }}</small>
+            </div>
+            <div class="col-md-3 text-end">
+                <span class="badge {{ 'badge-hemorrhage' if 'Hemorrhage' in p.prediction else 'badge-normal' }} px-3 py-2">
+                    {{ 'Hemorrhage' if 'Hemorrhage' in p.prediction else 'Normal' }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if test_samples %}
+    <div class="card p-4 mt-4">
+        <h5 class="text-info mb-3"><i class="bi bi-images"></i> Sample Test Images</h5>
+        <p class="text-muted mb-3">Download these sample brain CT images to test the scanner:</p>
+        <div class="row">
+            {% for sample in test_samples %}
+            <div class="col-md-2 mb-3 text-center">
+                <img src="/static/test_samples/{{ sample }}" class="rounded mb-2" style="width:100%;border:1px solid #30363d;">
+                <br><a href="/static/test_samples/{{ sample }}" download class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-download"></i> {{ sample.split('_')[1] | title }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

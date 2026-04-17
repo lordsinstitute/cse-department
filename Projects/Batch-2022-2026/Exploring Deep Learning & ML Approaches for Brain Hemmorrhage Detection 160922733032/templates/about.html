@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-3">
+    <h2 class="fw-bold mb-1"><i class="bi bi-info-circle"></i> About BrainScan AI</h2>
+    <p class="text-muted">Deep Learning & ML Approaches for Brain Hemorrhage Detection</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card p-4 mb-4">
+                <h4 class="text-info mb-3">What is BrainScan AI?</h4>
+                <p>BrainScan AI is an intelligent medical imaging analysis tool that uses deep learning
+                   and machine learning to detect brain hemorrhages from CT scan images. The system employs
+                   a Convolutional Neural Network (CNN) trained on brain CT images to classify scans as
+                   either <strong style="color:#f85149;">Hemorrhage</strong> or <strong style="color:#3fb950;">Normal</strong>.</p>
+
+                <h5 class="text-info mt-4 mb-3">Types of Hemorrhage Detected</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-2">
+                            <h6 style="color:#e63946;">Subdural</h6>
+                            <small>Bleeding between the brain surface and its outer covering (dura). Appears as crescent-shaped bright regions.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-2">
+                            <h6 style="color:#e63946;">Intracerebral</h6>
+                            <small>Bleeding within the brain tissue itself. Appears as bright irregular blobs within the parenchyma.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-2">
+                            <h6 style="color:#e63946;">Subarachnoid</h6>
+                            <small>Bleeding in the space between the brain and surrounding membrane. Appears as bright streaks in sulci.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="text-info mt-4 mb-3">How It Works</h5>
+                <div class="row text-center mt-2">
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">1</h1>
+                        <strong>Upload</strong>
+                        <p><small>Upload brain CT scan image</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">2</h1>
+                        <strong>Preprocess</strong>
+                        <p><small>Image resized and normalized</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">3</h1>
+                        <strong>Analyze</strong>
+                        <p><small>CNN extracts features and classifies</small></p>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 style="color:#e63946;">4</h1>
+                        <strong>Result</strong>
+                        <p><small>Prediction with confidence score</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4 mb-4">
+                <h5 class="text-info mb-3">Tech Stack</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><strong style="color:#e63946;">Deep Learning:</strong> PyTorch CNN</li>
+                    <li class="mb-2"><strong style="color:#e63946;">ML Models:</strong> Random Forest, SVM, Logistic Regression</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Backend:</strong> Python, Flask</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Database:</strong> SQLite</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Frontend:</strong> Bootstrap 5, Chart.js</li>
+                    <li class="mb-2"><strong style="color:#e63946;">Image Processing:</strong> Pillow, torchvision</li>
+                </ul>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h5 class="text-info mb-3">CNN Architecture</h5>
+                <ul class="list-unstyled" style="font-size:0.9rem;">
+                    <li class="mb-1"><code>Conv2d(1, 32)</code> + ReLU + MaxPool</li>
+                    <li class="mb-1"><code>Conv2d(32, 64)</code> + ReLU + MaxPool</li>
+                    <li class="mb-1"><code>Conv2d(64, 128)</code> + ReLU + MaxPool</li>
+                    <li class="mb-1"><code>Conv2d(128, 256)</code> + ReLU + MaxPool</li>
+                    <li class="mb-1"><code>Linear(256*8*8, 256)</code> + ReLU + Dropout</li>
+                    <li class="mb-1"><code>Linear(256, 1)</code> + Sigmoid</li>
+                </ul>
+            </div>
+
+            {% if models_info and models_info.get('models') %}
+            <div class="card p-4">
+                <h5 class="text-info mb-3">Model Accuracy</h5>
+                {% for name, metrics in models_info.models.items() %}
+                <div class="d-flex justify-content-between mb-2">
+                    <small>{{ name }}</small>
+                    <strong style="color:#3fb950;">{{ metrics.accuracy }}%</strong>
+                </div>
+                <div class="progress mb-3" style="height:8px;background:#21262d;">
+                    <div class="progress-bar" style="width:{{ metrics.accuracy }}%;background:{% if loop.index == 1 %}#e63946{% else %}#58a6ff{% endif %};"></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card p-3 mt-2">
+        <p class="mb-0 text-center text-muted"><small><strong>Disclaimer:</strong> This tool is for educational and research purposes only. It should not be used as a substitute for professional medical diagnosis. Always consult a qualified healthcare professional.</small></p>
+    </div>
+</div>
+{% endblock %}
