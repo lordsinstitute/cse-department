@@ -4,6 +4,12 @@ Fake News Intelligence System (FNIS) is a full-stack misinformation analysis pla
 
 The project is structured as a FastAPI backend plus a Next.js frontend. It supports headline verification, evidence-assisted trust scoring, feedback capture for human review, a live monitoring feed, and dashboard summaries backed by ChromaDB.
 
+## Team Members
+
+- Mohd Irfan Khan (160922733033)
+- Syed Fardeen (160922733024)
+- Mohammed Omer Ali (160922733057)
+
 ## Key Capabilities
 
 - Hybrid verification pipeline that combines:
