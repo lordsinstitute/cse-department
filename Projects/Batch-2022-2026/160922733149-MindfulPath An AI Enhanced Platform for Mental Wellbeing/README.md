@@ -29,6 +29,10 @@ An AI-powered mental wellbeing platform that combines Natural Language Processin
 | Charts | Chart.js |
 | Container | Docker |
 
+|Name|      |Roll number|
+|Syed Asim  ||160922733149|
+|Syed Mazher||160922733143|
+|Syed Rayyan||160922733156|
 ## Project Structure
 
 ```
