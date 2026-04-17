@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}Home — MedChain{% endblock %}
+{% block content %}
+
+{% if session.get('role') == 'admin' %}
+<!-- ═══════════ ADMIN HOME ═══════════ -->
+<h3 class="mb-4"><i class="bi bi-speedometer2 text-accent"></i> Admin Dashboard</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_users }}</h2>
+            <p><i class="bi bi-people"></i> Total Users</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_doctors }}</h2>
+            <p><i class="bi bi-heart-pulse"></i> Doctors</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_patients }}</h2>
+            <p><i class="bi bi-person"></i> Patients</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_reports }}</h2>
+            <p><i class="bi bi-file-earmark-medical"></i> Reports</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_blocks }}</h2>
+            <p><i class="bi bi-link-45deg"></i> Blocks</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <h2>{{ data.total_grants }}</h2>
+            <p><i class="bi bi-share"></i> Active Shares</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><a href="{{ url_for('blockchain_explorer') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-link-45deg"></i> Blockchain</a></div>
+    <div class="col-md-3"><a href="{{ url_for('audit_trail') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-journal-text"></i> Audit Trail</a></div>
+    <div class="col-md-3"><a href="{{ url_for('dashboard') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-bar-chart-line"></i> Dashboard</a></div>
+    <div class="col-md-3"><a href="{{ url_for('about') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-info-circle"></i> About</a></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Activity</h5></div>
+    <div class="card-body">
+        {% if data.recent_audit %}
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>User</th><th>Action</th><th>Details</th><th>Time</th></tr></thead>
+                <tbody>
+                {% for log in data.recent_audit %}
+                <tr>
+                    <td>{{ log.user_name or 'System' }}</td>
+                    <td><span class="badge bg-secondary">{{ log.action }}</span></td>
+                    <td>{{ log.details }}</td>
+                    <td class="text-muted small">{{ log.created_at[:16] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No recent activity.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% elif session.get('role') == 'doctor' %}
+<!-- ═══════════ DOCTOR HOME ═══════════ -->
+<h3 class="mb-4"><i class="bi bi-heart-pulse text-accent"></i> Welcome, Dr. {{ session.get('name').split()[-1] }}</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.reports_uploaded }}</h2>
+            <p><i class="bi bi-file-earmark-medical"></i> Reports Uploaded</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.patients_served }}</h2>
+            <p><i class="bi bi-people"></i> Patients Served</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.shared_with_me }}</h2>
+            <p><i class="bi bi-share"></i> Shared With Me</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><a href="{{ url_for('upload_report') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-cloud-upload"></i> Upload Report</a></div>
+    <div class="col-md-4"><a href="{{ url_for('patient_reports') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-file-earmark-medical"></i> Patient Reports</a></div>
+    <div class="col-md-4"><a href="{{ url_for('blockchain_explorer') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-link-45deg"></i> Blockchain</a></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Uploads</h5></div>
+    <div class="card-body">
+        {% if data.recent_reports %}
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Patient</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody>
+                {% for r in data.recent_reports %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ r.title }}</td>
+                    <td><span class="badge bg-secondary">{{ r.report_type }}</span></td>
+                    <td>{{ r.patient_name }}</td>
+                    <td class="text-muted small">{{ r.created_at[:16] }}</td>
+                    <td><a href="{{ url_for('view_report', report_id=r.id) }}" class="btn btn-sm btn-outline-light">View</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No reports uploaded yet. <a href="{{ url_for('upload_report') }}">Upload your first report</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% elif session.get('role') == 'patient' %}
+<!-- ═══════════ PATIENT HOME ═══════════ -->
+<h3 class="mb-4"><i class="bi bi-person-circle text-accent"></i> Welcome, {{ session.get('name') }}</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.my_reports }}</h2>
+            <p><i class="bi bi-file-earmark-medical"></i> My Reports</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.active_shares }}</h2>
+            <p><i class="bi bi-share"></i> Active Shares</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <h2>{{ data.doctors_count }}</h2>
+            <p><i class="bi bi-heart-pulse"></i> Doctors</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><a href="{{ url_for('my_reports') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-folder2-open"></i> My Reports</a></div>
+    <div class="col-md-4"><a href="{{ url_for('blockchain_explorer') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-link-45deg"></i> Blockchain</a></div>
+    <div class="col-md-4"><a href="{{ url_for('dashboard') }}" class="btn btn-primary w-100 py-3"><i class="bi bi-bar-chart-line"></i> Dashboard</a></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Reports</h5></div>
+    <div class="card-body">
+        {% if data.recent_reports %}
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Doctor</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for r in data.recent_reports %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ r.title }}</td>
+                    <td><span class="badge bg-secondary">{{ r.report_type }}</span></td>
+                    <td>{{ r.doctor_name }}</td>
+                    <td class="text-muted small">{{ r.created_at[:16] }}</td>
+                    <td>
+                        <a href="{{ url_for('view_report', report_id=r.id) }}" class="btn btn-sm btn-outline-light me-1">View</a>
+                        <a href="{{ url_for('share_report', report_id=r.id) }}" class="btn btn-sm btn-outline-info">Share</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No reports yet. Your doctor will upload reports for you.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
