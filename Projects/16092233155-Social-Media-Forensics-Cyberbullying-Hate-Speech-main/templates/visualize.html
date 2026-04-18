@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Visualizations — HateSpeech Analyzer{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-bar-chart"></i> EDA Visualizations</h2>
+<p class="text-muted mb-4">Exploratory Data Analysis of the hate speech dataset used for model training.</p>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Class Distribution</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/class_distribution.png') }}" class="img-fluid rounded" alt="Class Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-rulers"></i> Text Length Distribution</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/text_length_dist.png') }}" class="img-fluid rounded" alt="Text Length Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-hash"></i> Word Count Distribution</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/word_count_dist.png') }}" class="img-fluid rounded" alt="Word Count Distribution">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cloud"></i> Word Cloud — Hate Speech</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/wordcloud_hate.png') }}" class="img-fluid rounded" alt="Word Cloud Hate Speech">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cloud"></i> Word Cloud — Clean Text</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/wordcloud_clean.png') }}" class="img-fluid rounded" alt="Word Cloud Clean">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-list-stars"></i> Top TF-IDF Features by Class</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/top_features.png') }}" class="img-fluid rounded" alt="Top Features">
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-trophy"></i> Model Accuracy Comparison</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/model_comparison.png') }}" class="img-fluid rounded" alt="Model Comparison">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-grid-3x3"></i> Confusion Matrix (Best Model)</div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='vis/confusion_matrix.png') }}" class="img-fluid rounded" alt="Confusion Matrix" style="max-width: 500px;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

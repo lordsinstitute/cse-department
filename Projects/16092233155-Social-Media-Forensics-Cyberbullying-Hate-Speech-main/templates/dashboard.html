@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Model Dashboard — HateSpeech Analyzer{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Model Dashboard</h2>
+<p class="text-muted mb-4">Performance comparison of {{ models_info.models|length }} machine learning models trained on the hate speech dataset.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ models_info.train_size }}</h3>
+            <p><i class="bi bi-database"></i> Training Samples</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ models_info.test_size }}</h3>
+            <p><i class="bi bi-clipboard-data"></i> Test Samples</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>{{ models_info.n_features }}</h3>
+            <p><i class="bi bi-braces"></i> TF-IDF Features</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    {% for name, metrics in models_info.models.items()|sort(attribute='1.accuracy', reverse=true) %}
+    <div class="col-md-4">
+        <div class="card h-100 {% if name == models_info.best_model %}border-danger{% endif %}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ name }}</span>
+                {% if name == models_info.best_model %}
+                <span class="badge bg-danger"><i class="bi bi-trophy"></i> Best</span>
+                {% endif %}
+            </div>
+            <div class="card-body text-center">
+                <h2 class="{% if name == models_info.best_model %}text-danger{% endif %}">{{ metrics.accuracy }}%</h2>
+                <p class="text-muted mb-3">Accuracy</p>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted d-block">Precision</small>
+                        <strong>{{ metrics.precision }}%</strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted d-block">Recall</small>
+                        <strong>{{ metrics.recall }}%</strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted d-block">F1</small>
+                        <strong>{{ metrics.f1 }}%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-table"></i> Full Comparison</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1 Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, metrics in models_info.models.items()|sort(attribute='1.accuracy', reverse=true) %}
+                    <tr {% if name == models_info.best_model %}class="table-danger"{% endif %}>
+                        <td>
+                            {{ name }}
+                            {% if name == models_info.best_model %}
+                            <span class="badge bg-danger ms-1"><i class="bi bi-star-fill"></i></span>
+                            {% endif %}
+                        </td>
+                        <td>{{ metrics.accuracy }}%</td>
+                        <td>{{ metrics.precision }}%</td>
+                        <td>{{ metrics.recall }}%</td>
+                        <td>{{ metrics.f1 }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> Accuracy Comparison</div>
+            <div class="card-body">
+                <canvas id="accuracyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> F1 Score Comparison</div>
+            <div class="card-body">
+                <canvas id="f1Chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+const modelsData = {{ models_info.models|tojson }};
+const names = Object.keys(modelsData).sort((a, b) => modelsData[b].accuracy - modelsData[a].accuracy);
+const bestModel = "{{ models_info.best_model }}";
+
+const bgColors = names.map(n => n === bestModel ? '#ef4444' : '#64748b');
+
+new Chart(document.getElementById('accuracyChart'), {
+    type: 'bar',
+    data: {
+        labels: names,
+        datasets: [{
+            label: 'Accuracy (%)',
+            data: names.map(n => modelsData[n].accuracy),
+            backgroundColor: bgColors,
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: false, min: 80, grid: { color: 'rgba(255,255,255,0.08)' } },
+            x: { grid: { display: false }, ticks: { maxRotation: 45 } }
+        }
+    }
+});
+
+new Chart(document.getElementById('f1Chart'), {
+    type: 'bar',
+    data: {
+        labels: names,
+        datasets: [{
+            label: 'F1 Score (%)',
+            data: names.map(n => modelsData[n].f1),
+            backgroundColor: bgColors,
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: false, min: 80, grid: { color: 'rgba(255,255,255,0.08)' } },
+            x: { grid: { display: false }, ticks: { maxRotation: 45 } }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
