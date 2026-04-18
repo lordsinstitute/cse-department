@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}About — HateSpeech Analyzer{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> About This Project</h2>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-shield-exclamation"></i> Project Overview</div>
+            <div class="card-body">
+                <p>
+                    <strong>Social Media Hate Speech Analysis</strong> is a machine learning-powered web application
+                    that classifies social media text into three categories:
+                </p>
+                <ul>
+                    <li><span class="badge badge-hate">Hate Speech</span> — Content targeting protected groups based on race, religion, gender, nationality, or disability</li>
+                    <li><span class="badge badge-offensive">Offensive</span> — Rude, profane, or insulting language not specifically targeting protected groups</li>
+                    <li><span class="badge badge-clean">Clean</span> — Normal, non-harmful social media content</li>
+                </ul>
+                <p>
+                    The system uses Natural Language Processing (NLP) and machine learning to automatically detect
+                    harmful content, helping social media platforms moderate content and keep online spaces safer.
+                </p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-diagram-3"></i> How It Works</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 text-center">
+                        <div class="stat-card">
+                            <i class="bi bi-pencil-square text-danger" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0"><strong>1. Input Text</strong></p>
+                            <small class="text-muted">Enter or paste social media text</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-card">
+                            <i class="bi bi-funnel text-danger" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0"><strong>2. Preprocess</strong></p>
+                            <small class="text-muted">Clean, tokenize, remove noise</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-card">
+                            <i class="bi bi-cpu text-danger" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0"><strong>3. Classify</strong></p>
+                            <small class="text-muted">TF-IDF + ML model prediction</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-card">
+                            <i class="bi bi-check2-circle text-danger" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0"><strong>4. Result</strong></p>
+                            <small class="text-muted">Display classification + confidence</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-text-paragraph"></i> NLP Pipeline</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Step</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td>1. Lowercase</td><td>Convert all text to lowercase for uniformity</td></tr>
+                        <tr><td>2. Remove URLs</td><td>Strip out http links and web addresses</td></tr>
+                        <tr><td>3. Remove Mentions</td><td>Remove @username references</td></tr>
+                        <tr><td>4. Remove Hashtags</td><td>Remove #hashtag markers</td></tr>
+                        <tr><td>5. Remove Special Characters</td><td>Keep only alphabetic characters</td></tr>
+                        <tr><td>6. Remove Stopwords</td><td>Filter out common English words (the, is, at, etc.)</td></tr>
+                        <tr><td>7. TF-IDF Vectorization</td><td>Convert text to numerical features (5,000 features, uni+bigrams)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="bi bi-robot"></i> ML Models Compared</div>
+            <div class="card-body">
+                <ol>
+                    {% for name in models_info.models %}
+                    <li>
+                        {{ name }}
+                        {% if name == models_info.best_model %}
+                        <span class="badge bg-danger"><i class="bi bi-trophy"></i> Best — {{ models_info.models[name].accuracy }}%</span>
+                        {% else %}
+                        <span class="text-muted">— {{ models_info.models[name].accuracy }}%</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-trophy"></i> Best Model</div>
+            <div class="card-body text-center">
+                <h4 class="text-danger">{{ models_info.best_model }}</h4>
+                <h2>{{ models_info.models[models_info.best_model].accuracy }}%</h2>
+                <p class="text-muted">Accuracy</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-stack"></i> Tech Stack</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-filetype-py text-danger"></i> Python 3</li>
+                    <li class="mb-2"><i class="bi bi-globe text-danger"></i> Flask</li>
+                    <li class="mb-2"><i class="bi bi-cpu text-danger"></i> scikit-learn</li>
+                    <li class="mb-2"><i class="bi bi-file-text text-danger"></i> NLTK</li>
+                    <li class="mb-2"><i class="bi bi-table text-danger"></i> pandas + NumPy</li>
+                    <li class="mb-2"><i class="bi bi-bar-chart text-danger"></i> matplotlib + seaborn</li>
+                    <li class="mb-2"><i class="bi bi-database text-danger"></i> SQLite</li>
+                    <li class="mb-2"><i class="bi bi-palette text-danger"></i> Bootstrap 5</li>
+                    <li class="mb-2"><i class="bi bi-graph-up text-danger"></i> Chart.js</li>
+                    <li class="mb-2"><i class="bi bi-box text-danger"></i> Docker</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-database"></i> Dataset Info</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><strong>Total Samples:</strong> 15,000</li>
+                    <li class="mb-2"><strong>Classes:</strong> 3 (Hate Speech, Offensive, Clean)</li>
+                    <li class="mb-2"><strong>Train/Test:</strong> 80/20 split</li>
+                    <li class="mb-2"><strong>TF-IDF Features:</strong> {{ models_info.n_features }}</li>
+                    <li class="mb-2"><strong>N-gram Range:</strong> (1, 2)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="bi bi-shield-lock"></i> Security</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-check text-success"></i> PBKDF2-SHA256 password hashing</li>
+                    <li class="mb-2"><i class="bi bi-check text-success"></i> Session-based authentication</li>
+                    <li class="mb-2"><i class="bi bi-check text-success"></i> SQL parameterized queries</li>
+                    <li class="mb-2"><i class="bi bi-check text-success"></i> Input validation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-people"></i> Team</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Roll Number</th><th>Name</th></tr></thead>
+                    <tbody>
+                        <tr><td>160922733155</td><td>Syed Muzammil Hussaini</td></tr>
+                        <tr><td>160922733136</td><td>Omer Farooq</td></tr>
+                        <tr><td>160922733157</td><td>S.S Quadri</td></tr>
+                        <tr><td>160922733134</td><td>Mustafa Wasif Hussain</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
