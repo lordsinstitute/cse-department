@@ -12,6 +12,26 @@ The system uses a Convolutional Neural Network (CNN) model to assist medical pro
 
 ---
 
+## 👨‍💻 Team Members  
+
+| S.No | Name                 |    Roll Number    |
+|------|----------------------|-------------------|
+| 1    | Mohammed Abdul Aziz Taha | 160922733091  |
+| 2    | Mohammed Abdul Amaan     | 160922733090  |
+| 3    | Mohammed Awais Ahmed     | 160922733102  |
+
+---
+
+## 🎓 Project Guide  
+
+| Name     | Designation         |
+|----------|---------------------|
+| MD Asma  | Associate Professor |
+
+---
+
+---
+
 ## 🎯 Objectives  
 - Detect stroke from CT scan images with high accuracy  
 - Assist doctors in early diagnosis  
@@ -87,23 +107,7 @@ python app.py
 
 ---
 
-## 👨‍💻 Team Members  
 
-| S.No | Name                 |    Roll Number    |
-|------|----------------------|-------------------|
-| 1    | Mohammed Abdul Aziz Taha | 160922733091  |
-| 2    | Mohammed Abdul Amaan     | 160922733090  |
-| 3    | Mohammed Awais Ahmed     | 160922733102  |
-
----
-
-## 🎓 Project Guide  
-
-| Name     | Designation         |
-|----------|---------------------|
-| MD Asma  | Associate Professor |
-
----
 
 ## 📌 Future Scope  
 - Multi-class stroke classification  
