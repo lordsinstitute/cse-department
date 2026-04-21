@@ -1,0 +1,165 @@
+{
+  "models": {
+    "Logistic Regression": {
+      "accuracy": 91.45,
+      "precision": 92.05,
+      "recall": 90.47,
+      "f1": 91.25,
+      "confusion_matrix": [
+        [
+          937,
+          77
+        ],
+        [
+          94,
+          892
+        ]
+      ]
+    },
+    "K-Nearest Neighbors": {
+      "accuracy": 91.95,
+      "precision": 91.46,
+      "recall": 92.29,
+      "f1": 91.87,
+      "confusion_matrix": [
+        [
+          929,
+          85
+        ],
+        [
+          76,
+          910
+        ]
+      ]
+    },
+    "SVM": {
+      "accuracy": 92.3,
+      "precision": 91.52,
+      "recall": 93.0,
+      "f1": 92.25,
+      "confusion_matrix": [
+        [
+          929,
+          85
+        ],
+        [
+          69,
+          917
+        ]
+      ]
+    },
+    "Naive Bayes": {
+      "accuracy": 82.85,
+      "precision": 92.25,
+      "recall": 71.2,
+      "f1": 80.37,
+      "confusion_matrix": [
+        [
+          955,
+          59
+        ],
+        [
+          284,
+          702
+        ]
+      ]
+    },
+    "Decision Tree": {
+      "accuracy": 89.1,
+      "precision": 91.03,
+      "recall": 86.41,
+      "f1": 88.66,
+      "confusion_matrix": [
+        [
+          930,
+          84
+        ],
+        [
+          134,
+          852
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 90.65,
+      "precision": 90.56,
+      "recall": 90.47,
+      "f1": 90.51,
+      "confusion_matrix": [
+        [
+          921,
+          93
+        ],
+        [
+          94,
+          892
+        ]
+      ]
+    },
+    "Gradient Boosting": {
+      "accuracy": 92.35,
+      "precision": 91.53,
+      "recall": 93.1,
+      "f1": 92.31,
+      "confusion_matrix": [
+        [
+          929,
+          85
+        ],
+        [
+          68,
+          918
+        ]
+      ]
+    },
+    "MLP Neural Network": {
+      "accuracy": 92.3,
+      "precision": 91.43,
+      "recall": 93.1,
+      "f1": 92.26,
+      "confusion_matrix": [
+        [
+          928,
+          86
+        ],
+        [
+          68,
+          918
+        ]
+      ]
+    }
+  },
+  "best_model": "Gradient Boosting",
+  "features": [
+    "url_length",
+    "n_dots",
+    "n_hyphens",
+    "n_underscores",
+    "n_slashes",
+    "n_question_marks",
+    "n_equal",
+    "n_at",
+    "n_ampersand",
+    "n_percent",
+    "n_digits",
+    "n_letters",
+    "n_special",
+    "has_https",
+    "has_ip",
+    "domain_length",
+    "n_subdomains",
+    "path_length",
+    "url_depth",
+    "has_at_symbol",
+    "double_slash_redirect",
+    "prefix_suffix",
+    "n_suspicious_words",
+    "is_shortened",
+    "suspicious_tld",
+    "digit_ratio",
+    "letter_ratio",
+    "special_ratio"
+  ],
+  "test_size": 2000,
+  "train_size": 8000
+}
