@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stroke-type-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 1.2rem;
+        height: 100%;
+    }
+    .stroke-type-card h6 { color: #3b82f6; }
+    .arch-step {
+        background: rgba(59, 130, 246, 0.08);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+    .arch-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 1.5rem;
+    }
+    .tech-badge {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        display: inline-block;
+        margin: 0.2rem;
+        font-size: 0.85rem;
+    }
+    .cnn-layer {
+        background: rgba(59, 130, 246, 0.06);
+        border-left: 3px solid #3b82f6;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0 6px 6px 0;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> About This Project</h2>
+
+<!-- Project Overview -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-file-text"></i> Project Overview</div>
+    <div class="card-body">
+        <h5 class="text-blue">AI-Based Medical Image Analysis Using Deep Learning</h5>
+        <p>This system uses a Convolutional Neural Network (CNN) to detect brain strokes from CT scan images. Brain stroke is a medical emergency that occurs when blood supply to the brain is interrupted, leading to brain cell death. Early detection through CT imaging and AI-powered analysis can significantly improve patient outcomes.</p>
+        <p class="mb-0">The system classifies CT brain images into two categories: <strong class="text-success">Normal</strong> (healthy brain) and <strong class="text-danger">Stroke Detected</strong> (signs of stroke present).</p>
+    </div>
+</div>
+
+<!-- Types of Brain Stroke -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-heart-pulse"></i> Types of Brain Stroke</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stroke-type-card">
+                    <h6><i class="bi bi-circle-fill text-danger"></i> Ischemic Stroke</h6>
+                    <p class="text-muted small mb-1"><strong>~87% of all strokes</strong></p>
+                    <p class="small mb-0">Caused by a blood clot blocking an artery in the brain. Appears as dark (hypodense) patches on CT scans, indicating tissue death from lack of blood flow.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stroke-type-card">
+                    <h6><i class="bi bi-circle-fill text-warning"></i> Hemorrhagic Stroke</h6>
+                    <p class="text-muted small mb-1"><strong>~13% of all strokes</strong></p>
+                    <p class="small mb-0">Caused by a blood vessel rupturing in the brain. Appears as bright (hyperdense) regions on CT scans due to blood pooling in brain tissue.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stroke-type-card">
+                    <h6><i class="bi bi-circle-fill text-info"></i> Transient Ischemic Attack</h6>
+                    <p class="text-muted small mb-1"><strong>"Mini Stroke"</strong></p>
+                    <p class="small mb-0">Temporary blockage of blood flow. Symptoms resolve within 24 hours, but it serves as a warning sign for potential future strokes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Architecture -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-diagram-3"></i> System Architecture</div>
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col">
+                <div class="arch-step">
+                    <i class="bi bi-upload d-block mb-1" style="font-size: 1.5rem;"></i>
+                    <strong>Upload</strong><br>
+                    <small class="text-muted">CT Scan Image</small>
+                </div>
+            </div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col">
+                <div class="arch-step">
+                    <i class="bi bi-image d-block mb-1" style="font-size: 1.5rem;"></i>
+                    <strong>Preprocess</strong><br>
+                    <small class="text-muted">Grayscale, 128x128</small>
+                </div>
+            </div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col">
+                <div class="arch-step">
+                    <i class="bi bi-cpu d-block mb-1" style="font-size: 1.5rem;"></i>
+                    <strong>CNN Model</strong><br>
+                    <small class="text-muted">4-Layer Feature Extraction</small>
+                </div>
+            </div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col">
+                <div class="arch-step">
+                    <i class="bi bi-clipboard2-pulse d-block mb-1" style="font-size: 1.5rem;"></i>
+                    <strong>Result</strong><br>
+                    <small class="text-muted">Normal / Stroke</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CNN Architecture -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-layers"></i> CNN Architecture</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-blue mb-3">Feature Extraction Layers</h6>
+                <div class="cnn-layer">
+                    <strong>Input:</strong> 1 x 128 x 128 (Grayscale CT image)
+                </div>
+                <div class="cnn-layer">
+                    <strong>Conv2D Layer 1:</strong> 32 filters (3x3) + ReLU + MaxPool(2x2)
+                </div>
+                <div class="cnn-layer">
+                    <strong>Conv2D Layer 2:</strong> 64 filters (3x3) + ReLU + MaxPool(2x2)
+                </div>
+                <div class="cnn-layer">
+                    <strong>Conv2D Layer 3:</strong> 128 filters (3x3) + ReLU + MaxPool(2x2)
+                </div>
+                <div class="cnn-layer">
+                    <strong>Conv2D Layer 4:</strong> 256 filters (3x3) + ReLU + MaxPool(2x2)
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-blue mb-3">Classification Layers</h6>
+                <div class="cnn-layer">
+                    <strong>Flatten:</strong> 256 x 8 x 8 = 16,384 features
+                </div>
+                <div class="cnn-layer">
+                    <strong>Dense Layer 1:</strong> 256 neurons + ReLU + Dropout(0.5)
+                </div>
+                <div class="cnn-layer">
+                    <strong>Dense Layer 2:</strong> 1 neuron + Sigmoid
+                </div>
+                <div class="cnn-layer">
+                    <strong>Output:</strong> Probability (0.0 - 1.0)
+                </div>
+
+                <h6 class="text-blue mt-4 mb-2">Training Parameters</h6>
+                <table class="table table-sm">
+                    <tr><td class="text-muted">Loss Function</td><td>Binary Cross-Entropy</td></tr>
+                    <tr><td class="text-muted">Optimizer</td><td>Adam (lr=0.001)</td></tr>
+                    <tr><td class="text-muted">Epochs</td><td>15</td></tr>
+                    <tr><td class="text-muted">Batch Size</td><td>32</td></tr>
+                    <tr><td class="text-muted">Input Size</td><td>128 x 128 pixels</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tech Stack -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-stack"></i> Technology Stack</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <h6 class="text-blue">Backend</h6>
+                <span class="tech-badge">Python</span>
+                <span class="tech-badge">Flask</span>
+                <span class="tech-badge">SQLite</span>
+                <span class="tech-badge">Werkzeug</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-blue">Deep Learning</h6>
+                <span class="tech-badge">PyTorch</span>
+                <span class="tech-badge">TorchVision</span>
+                <span class="tech-badge">CNN</span>
+                <span class="tech-badge">NumPy</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-blue">Frontend</h6>
+                <span class="tech-badge">Bootstrap 5</span>
+                <span class="tech-badge">Chart.js</span>
+                <span class="tech-badge">Jinja2</span>
+                <span class="tech-badge">Bootstrap Icons</span>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <h6 class="text-blue">Machine Learning</h6>
+                <span class="tech-badge">Scikit-learn</span>
+                <span class="tech-badge">Random Forest</span>
+                <span class="tech-badge">SVM</span>
+                <span class="tech-badge">Logistic Regression</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-blue">Image Processing</h6>
+                <span class="tech-badge">Pillow (PIL)</span>
+                <span class="tech-badge">Grayscale Conversion</span>
+                <span class="tech-badge">Image Resize</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-blue">Deployment</h6>
+                <span class="tech-badge">Docker</span>
+                <span class="tech-badge">Dockerfile</span>
+                <span class="tech-badge">Port 5010</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dataset Info -->
+<div class="card">
+    <div class="card-header"><i class="bi bi-database"></i> Dataset Information</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>1,000</h3>
+                    <p>Total CT Images</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>500</h3>
+                    <p>Stroke Images</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>500</h3>
+                    <p>Normal Images</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>128x128</h3>
+                    <p>Image Resolution</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted mt-3 mb-0">
+            <i class="bi bi-info-circle"></i>
+            The dataset includes synthetic CT brain scan images generated with realistic brain tissue patterns,
+            ventricles, midline structures, and pathological features (ischemic dark patches, midline shift)
+            for stroke detection training. Train/Test split: 80/20.
+        </p>
+    </div>
+</div>
+{% endblock %}
