@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Home - Insurance Claim Predictor{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-house"></i> Welcome, {{ session.get('name', '') }}!</h2>
+        <p class="text-muted">Car Insurance Claim Prediction using Machine Learning</p>
+    </div>
+</div>
+
+<!-- User Stats -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center">
+            <h1 class="display-4 text-primary">{{ total }}</h1>
+            <p class="text-muted mb-0">Total Predictions</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center">
+            <h1 class="display-4 text-danger">{{ claims }}</h1>
+            <p class="text-muted mb-0">Claims Predicted</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center">
+            <h1 class="display-4 text-success">{{ no_claims }}</h1>
+            <p class="text-muted mb-0">No Claim Predicted</p>
+        </div>
+    </div>
+</div>
+
+{% if admin_stats %}
+<div class="row mb-4">
+    <div class="col-12"><h5><i class="bi bi-gear"></i> Admin Statistics</h5></div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center border-warning">
+            <h2 class="text-warning">{{ admin_stats.total_users }}</h2>
+            <p class="text-muted mb-0">Registered Users</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center border-warning">
+            <h2 class="text-warning">{{ admin_stats.total_predictions }}</h2>
+            <p class="text-muted mb-0">Total Predictions (All Users)</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card p-3 text-center border-warning">
+            <h2 class="text-warning">{{ admin_stats.total_claims }}</h2>
+            <p class="text-muted mb-0">Total Claims Predicted</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card p-4">
+            <h5><i class="bi bi-search"></i> Make a Prediction</h5>
+            <p class="text-muted">Enter customer details to predict whether they will file an insurance claim.</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary"><i class="bi bi-arrow-right"></i> Go to Predict</a>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card p-4">
+            <h5><i class="bi bi-bar-chart"></i> Data Visualizations</h5>
+            <p class="text-muted">Explore the dataset through interactive charts and EDA visualizations.</p>
+            <a href="{{ url_for('visualize') }}" class="btn btn-info"><i class="bi bi-arrow-right"></i> View Charts</a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions -->
+{% if recent %}
+<div class="row">
+    <div class="col-12">
+        <h5><i class="bi bi-clock-history"></i> Recent Predictions</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead><tr><th>Date</th><th>Result</th><th>Confidence</th></tr></thead>
+                <tbody>
+                {% for p in recent %}
+                <tr>
+                    <td>{{ p['pred_date'] }}</td>
+                    <td>
+                        {% if 'Claim Likely' in p['prediction'] %}
+                        <span class="badge badge-claim">{{ p['prediction'] }}</span>
+                        {% else %}
+                        <span class="badge badge-noclaim">{{ p['prediction'] }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ p['confidence'] }}%</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
