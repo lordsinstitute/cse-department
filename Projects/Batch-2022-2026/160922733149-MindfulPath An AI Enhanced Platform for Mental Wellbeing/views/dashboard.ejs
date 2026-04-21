@@ -1,0 +1,195 @@
+<%- include('partials/header') %>
+
+<h2 class="mb-4"><i class="bi bi-speedometer2 text-accent"></i> Dashboard</h2>
+
+<% if (user.role === 'admin') { %>
+<!-- ADMIN DASHBOARD -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <a href="/chat/admin/chats" class="text-decoration-none">
+      <div class="card glass-card p-3 d-flex flex-row align-items-center gap-3 hover-card">
+        <i class="bi bi-shield-lock-fill text-accent" style="font-size:2rem;"></i>
+        <div>
+          <h6 class="mb-0">User Chat History</h6>
+          <small class="text-muted">View all users' AI chatbot conversations</small>
+        </div>
+        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a href="/admin/settings" class="text-decoration-none">
+      <div class="card glass-card p-3 d-flex flex-row align-items-center gap-3 hover-card">
+        <i class="bi bi-gear-fill text-warning" style="font-size:2rem;"></i>
+        <div>
+          <h6 class="mb-0">AI Engine Settings</h6>
+          <small class="text-muted">Switch between local model and LLM API</small>
+        </div>
+        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4 col-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-people-fill text-accent" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= stats.totalUsers %></h3>
+      <small class="text-muted">Users</small>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-person-badge-fill text-info" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= stats.totalTherapists %></h3>
+      <small class="text-muted">Therapists</small>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-calendar-check-fill text-success" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= stats.totalSessions %></h3>
+      <small class="text-muted">Sessions</small>
+    </div>
+  </div>
+  <div class="col-md-6 col-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-chat-dots-fill text-warning" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= stats.totalChats %></h3>
+      <small class="text-muted">Chat Messages</small>
+    </div>
+  </div>
+  <div class="col-md-6 col-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-emoji-smile-fill text-danger" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= stats.totalMoodEntries %></h3>
+      <small class="text-muted">Mood Entries</small>
+    </div>
+  </div>
+</div>
+
+<% } else if (user.role === 'therapist') { %>
+<!-- THERAPIST DASHBOARD -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-people text-accent" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= typeof patientCount !== 'undefined' ? patientCount : 0 %></h3>
+      <small class="text-muted">Total Patients</small>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card glass-card p-3 text-center">
+      <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+      <h3 class="mt-2"><%= typeof completedCount !== 'undefined' ? completedCount : 0 %></h3>
+      <small class="text-muted">Completed Sessions</small>
+    </div>
+  </div>
+</div>
+
+<div class="card glass-card p-4">
+  <h5><i class="bi bi-calendar-check text-accent"></i> Upcoming Sessions</h5>
+  <% if (typeof upcomingSessions !== 'undefined' && upcomingSessions.length > 0) { %>
+  <div class="table-responsive mt-3">
+    <table class="table table-dark table-hover">
+      <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Type</th><th>Duration</th></tr></thead>
+      <tbody>
+        <% upcomingSessions.forEach(s => { %>
+        <tr>
+          <td><%= s.patient_name %></td>
+          <td><%= s.session_date %></td>
+          <td><%= s.session_time %></td>
+          <td><span class="badge bg-info"><%= s.type %></span></td>
+          <td><%= s.duration %> min</td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <p class="text-muted mt-3">No upcoming sessions.</p>
+  <% } %>
+</div>
+
+<% } else { %>
+<!-- USER DASHBOARD -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <a href="/chat" class="text-decoration-none">
+      <div class="card glass-card p-3 text-center hover-card">
+        <i class="bi bi-chat-heart-fill text-accent" style="font-size: 2.5rem;"></i>
+        <h5 class="mt-2">Start AI Chat</h5>
+        <small class="text-muted">Talk to your wellness companion</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="/mood" class="text-decoration-none">
+      <div class="card glass-card p-3 text-center hover-card">
+        <i class="bi bi-emoji-smile-fill text-warning" style="font-size: 2.5rem;"></i>
+        <h5 class="mt-2">Log Mood</h5>
+        <small class="text-muted">Track how you're feeling</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="/meditations" class="text-decoration-none">
+      <div class="card glass-card p-3 text-center hover-card">
+        <i class="bi bi-flower1 text-info" style="font-size: 2.5rem;"></i>
+        <h5 class="mt-2">Meditations</h5>
+        <small class="text-muted">Guided meditation library</small>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Mood Trend Chart -->
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card glass-card p-4">
+      <h5><i class="bi bi-graph-up text-accent"></i> Mood Trend (Last 7 Days)</h5>
+      <canvas id="moodChart" height="200"></canvas>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card glass-card p-4 mb-3">
+      <h5><i class="bi bi-chat-dots text-accent"></i> Recent Chats</h5>
+      <% if (recentChats.length > 0) { %>
+        <% recentChats.forEach(c => { %>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
+          <small><%= new Date(c.started_at).toLocaleDateString() %></small>
+          <span class="badge bg-secondary"><%= c.message_count %> msgs</span>
+        </div>
+        <% }); %>
+      <% } else { %>
+      <p class="text-muted small">No chat sessions yet. <a href="/chat" class="text-accent">Start one!</a></p>
+      <% } %>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h5><i class="bi bi-calendar-check text-accent"></i> Upcoming Sessions</h5>
+      <% if (upcomingSessions.length > 0) { %>
+        <% upcomingSessions.forEach(s => { %>
+        <div class="py-2 border-bottom border-secondary">
+          <strong><%= s.therapist_name %></strong><br>
+          <small class="text-muted"><%= s.session_date %> at <%= s.session_time %></small>
+        </div>
+        <% }); %>
+      <% } else { %>
+      <p class="text-muted small">No upcoming sessions. <a href="/sessions" class="text-accent">Book one!</a></p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script src="/js/charts.js"></script>
+<script>
+  const moodData = <%- JSON.stringify(moodEntries.reverse()) %>;
+  if (moodData.length > 0) {
+    renderMoodChart('moodChart', moodData);
+  }
+</script>
+<% } %>
+
+<%- include('partials/footer') %>

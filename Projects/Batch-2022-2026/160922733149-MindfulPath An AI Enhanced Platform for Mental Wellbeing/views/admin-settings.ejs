@@ -1,0 +1,263 @@
+<%- include('partials/header') %>
+
+<div class="d-flex align-items-center gap-2 mb-4">
+  <a href="/dashboard" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i></a>
+  <h4 class="mb-0"><i class="bi bi-gear-fill text-accent"></i> AI Engine Settings</h4>
+</div>
+
+<div class="row g-4">
+  <!-- Settings Form -->
+  <div class="col-lg-7">
+    <form id="settingsForm" action="/admin/settings" method="POST">
+      <div class="card glass-card p-4 mb-4">
+        <h6 class="mb-3"><i class="bi bi-cpu text-accent"></i> Response Engine</h6>
+
+        <div class="d-flex flex-column gap-3">
+          <label class="d-flex align-items-start gap-3 p-3 rounded-3 border border-secondary mode-option <%= settings.nlp_mode === 'local' ? 'border-accent active-mode' : '' %>" style="cursor:pointer;">
+            <input type="radio" name="nlp_mode" value="local" class="form-check-input mt-1 flex-shrink-0" <%= settings.nlp_mode === 'local' ? 'checked' : '' %>>
+            <div>
+              <strong>Local Model</strong>
+              <div class="text-muted small mt-1">Uses DistilBERT transformer running on this machine. No API key needed. Responses are pre-written CBT templates selected by sentiment score.</div>
+              <span class="badge bg-success mt-1">No cost · No internet required</span>
+            </div>
+          </label>
+
+          <label class="d-flex align-items-start gap-3 p-3 rounded-3 border border-secondary mode-option <%= settings.nlp_mode === 'api' ? 'border-accent active-mode' : '' %>" style="cursor:pointer;">
+            <input type="radio" name="nlp_mode" value="api" class="form-check-input mt-1 flex-shrink-0" <%= settings.nlp_mode === 'api' ? 'checked' : '' %>>
+            <div>
+              <strong>LLM API</strong>
+              <div class="text-muted small mt-1">Routes chatbot responses through an external LLM. Responses are dynamic, context-aware, and personalised. Sentiment analysis still runs locally.</div>
+              <span class="badge bg-warning text-dark mt-1">Requires API key · Per-request cost</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- API Configuration -->
+      <div class="card glass-card p-4 mb-4" id="apiConfig" style="<%= settings.nlp_mode === 'api' ? '' : 'display:none;' %>">
+        <h6 class="mb-3"><i class="bi bi-key text-accent"></i> API Configuration</h6>
+
+        <!-- Provider cards -->
+        <label class="form-label">Provider</label>
+        <div class="row g-2 mb-3" id="providerCards">
+
+          <!-- Anthropic Claude -->
+          <div class="col-md-4">
+            <label class="provider-card d-flex flex-column align-items-center p-3 rounded-3 border text-center h-100 <%= settings.api_provider === 'claude' ? 'border-accent provider-active' : 'border-secondary' %>" style="cursor:pointer;">
+              <input type="radio" name="api_provider" value="claude" class="d-none provider-radio" <%= settings.api_provider === 'claude' ? 'checked' : '' %>>
+              <img src="https://img.icons8.com/color/48/claude-ai.png" width="36" height="36" onerror="this.style.display='none'" alt="">
+              <strong class="mt-2 small">Anthropic</strong>
+              <span class="text-muted" style="font-size:0.72rem;">Claude</span>
+            </label>
+          </div>
+
+          <!-- OpenAI -->
+          <div class="col-md-4">
+            <label class="provider-card d-flex flex-column align-items-center p-3 rounded-3 border text-center h-100 <%= settings.api_provider === 'openai' ? 'border-accent provider-active' : 'border-secondary' %>" style="cursor:pointer;">
+              <input type="radio" name="api_provider" value="openai" class="d-none provider-radio" <%= settings.api_provider === 'openai' ? 'checked' : '' %>>
+              <div style="width:36px;height:36px;background:#10a37f;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                <span style="color:#fff;font-weight:bold;font-size:1rem;">AI</span>
+              </div>
+              <strong class="mt-2 small">OpenAI</strong>
+              <span class="text-muted" style="font-size:0.72rem;">GPT models</span>
+            </label>
+          </div>
+
+          <!-- Google Gemini -->
+          <div class="col-md-4">
+            <label class="provider-card d-flex flex-column align-items-center p-3 rounded-3 border text-center h-100 <%= settings.api_provider === 'gemini' ? 'border-accent provider-active' : 'border-secondary' %>" style="cursor:pointer;">
+              <input type="radio" name="api_provider" value="gemini" class="d-none provider-radio" <%= settings.api_provider === 'gemini' ? 'checked' : '' %>>
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#4285f4,#34a853,#ea4335,#fbbc04);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                <span style="color:#fff;font-weight:bold;font-size:0.85rem;">G</span>
+              </div>
+              <strong class="mt-2 small">Google</strong>
+              <span class="text-muted" style="font-size:0.72rem;">Gemini</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- API Key (per-provider) -->
+        <div class="mb-3">
+          <label class="form-label d-flex align-items-center gap-2">
+            API Key
+            <span id="keyLabel" class="badge bg-secondary small"></span>
+          </label>
+          <input type="password" name="api_key" id="apiKeyInput" class="form-control bg-dark text-light border-secondary"
+            placeholder="<%= settings.api_key ? '••••••••••••••••••••' : 'Enter API key...' %>"
+            autocomplete="off">
+          <% if (settings.api_key) { %>
+          <div class="form-text text-success"><i class="bi bi-check-circle"></i> API key is saved. Leave blank to keep existing key.</div>
+          <% } else { %>
+          <div id="keyHintText" class="form-text text-muted"></div>
+          <% } %>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Model</label>
+          <input type="text" name="api_model" id="modelInput" class="form-control bg-dark text-light border-secondary"
+            value="<%= settings.api_model %>">
+          <div class="form-text text-muted" id="modelHint"></div>
+        </div>
+
+        <button type="button" id="testBtn" class="btn btn-outline-info btn-sm">
+          <i class="bi bi-wifi"></i> Test Connection
+        </button>
+        <span id="testResult" class="ms-2 small"></span>
+      </div>
+
+      <button type="submit" class="btn btn-accent px-4">
+        <i class="bi bi-save"></i> Save Settings
+      </button>
+    </form>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="col-lg-5">
+    <div class="card glass-card p-4 mb-3">
+      <h6><i class="bi bi-info-circle text-accent"></i> Recommended Models</h6>
+      <table class="table table-dark table-sm mt-2 mb-0">
+        <thead><tr><th>Provider</th><th>Model ID</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge bg-secondary">Claude</span></td><td><code>claude-haiku-4-5-20251001</code></td><td>Fast · Cheap</td></tr>
+          <tr><td><span class="badge bg-secondary">Claude</span></td><td><code>claude-sonnet-4-6</code></td><td>Smarter</td></tr>
+          <tr><td><span class="badge" style="background:#10a37f;">OpenAI</span></td><td><code>gpt-4o-mini</code></td><td>Fast · Cheap</td></tr>
+          <tr><td><span class="badge" style="background:#10a37f;">OpenAI</span></td><td><code>gpt-4o</code></td><td>Best quality</td></tr>
+          <tr><td><span class="badge" style="background:#4285f4;">Gemini</span></td><td><code>gemini-2.0-flash</code></td><td>Fast · Cheap</td></tr>
+          <tr><td><span class="badge" style="background:#4285f4;">Gemini</span></td><td><code>gemini-1.5-pro</code></td><td>Smarter</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card glass-card p-4 mb-3">
+      <h6><i class="bi bi-shield-check text-accent"></i> How It Works</h6>
+      <ul class="text-muted small mb-0 ps-3">
+        <li class="mb-1">Sentiment analysis always runs locally (DistilBERT)</li>
+        <li class="mb-1">Crisis keyword detection always runs locally — LLM is never called for crisis messages</li>
+        <li class="mb-1">In API mode, the last session messages are sent as context to the LLM</li>
+        <li class="mb-1">If the API call fails, the chatbot automatically falls back to local CBT responses</li>
+      </ul>
+    </div>
+
+    <div class="card glass-card p-4">
+      <h6><i class="bi bi-activity text-accent"></i> Current Status</h6>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <span class="badge <%= settings.nlp_mode === 'api' ? 'bg-warning text-dark' : 'bg-success' %> fs-6">
+          <%= settings.nlp_mode === 'api' ? 'LLM API Mode' : 'Local Model Mode' %>
+        </span>
+      </div>
+      <% if (settings.nlp_mode === 'api') { %>
+      <div class="mt-2 small text-muted">
+        Provider: <strong>
+          <% if (settings.api_provider === 'claude') { %>Anthropic Claude
+          <% } else if (settings.api_provider === 'openai') { %>OpenAI
+          <% } else if (settings.api_provider === 'gemini') { %>Google Gemini
+          <% } %>
+        </strong><br>
+        Model: <strong><%= settings.api_model %></strong><br>
+        Key: <strong><%= settings.api_key ? '••••••••' + settings.api_key.slice(-4) : 'Not set' %></strong>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+.provider-card { transition: border-color 0.2s, background 0.2s; }
+.provider-card:hover { background: rgba(124,58,237,0.08); }
+.provider-active { background: rgba(124,58,237,0.12) !important; border-color: var(--accent) !important; }
+</style>
+
+<script>
+const radios       = document.querySelectorAll('input[name="nlp_mode"]');
+const apiConfig    = document.getElementById('apiConfig');
+const providerRadios = document.querySelectorAll('.provider-radio');
+const modelInput   = document.getElementById('modelInput');
+const modelHint    = document.getElementById('modelHint');
+const keyLabel     = document.getElementById('keyLabel');
+const keyHintText  = document.getElementById('keyHintText');
+
+const providerMeta = {
+  claude: {
+    defaultModel: 'claude-haiku-4-5-20251001',
+    modelHint:    'Recommended: claude-haiku-4-5-20251001 or claude-sonnet-4-6',
+    keyLabel:     'sk-ant-…',
+    keyHint:      'Get your key at console.anthropic.com'
+  },
+  openai: {
+    defaultModel: 'gpt-4o-mini',
+    modelHint:    'Recommended: gpt-4o-mini or gpt-4o',
+    keyLabel:     'sk-…',
+    keyHint:      'Get your key at platform.openai.com'
+  },
+  gemini: {
+    defaultModel: 'gemini-2.0-flash',
+    modelHint:    'Recommended: gemini-2.0-flash or gemini-1.5-pro',
+    keyLabel:     'AIza…',
+    keyHint:      'Get your key at aistudio.google.com/app/apikey'
+  }
+};
+
+function getSelectedProvider() {
+  return document.querySelector('.provider-radio:checked')?.value || 'claude';
+}
+
+function updateProviderUI() {
+  const p = getSelectedProvider();
+  const meta = providerMeta[p];
+
+  // Update card highlight
+  document.querySelectorAll('.provider-card').forEach(card => {
+    const radio = card.querySelector('.provider-radio');
+    card.classList.toggle('provider-active', radio.checked);
+  });
+
+  // Update model field
+  if (!modelInput.value || Object.values(providerMeta).some(m => m.defaultModel === modelInput.value)) {
+    modelInput.value = meta.defaultModel;
+  }
+  modelHint.textContent   = meta.modelHint;
+  keyLabel.textContent    = meta.keyLabel;
+  if (keyHintText) keyHintText.textContent = meta.keyHint;
+}
+
+// Mode toggle
+radios.forEach(r => {
+  r.addEventListener('change', () => {
+    apiConfig.style.display = r.value === 'api' ? '' : 'none';
+  });
+});
+
+// Provider card selection
+providerRadios.forEach(r => {
+  r.addEventListener('change', updateProviderUI);
+});
+
+// Init
+updateProviderUI();
+
+// Test connection
+document.getElementById('testBtn').addEventListener('click', async () => {
+  const btn    = document.getElementById('testBtn');
+  const result = document.getElementById('testResult');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Testing...';
+  result.textContent = '';
+
+  try {
+    const res  = await fetch('/admin/settings/test', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const data = await res.json();
+    if (data.success) {
+      result.innerHTML = `<span class="text-success"><i class="bi bi-check-circle"></i> Connected! Reply: "${data.reply.slice(0, 70)}…"</span>`;
+    } else {
+      result.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle"></i> ${data.error}</span>`;
+    }
+  } catch (e) {
+    result.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Request failed</span>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-wifi"></i> Test Connection';
+});
+</script>
+
+<%- include('partials/footer') %>
