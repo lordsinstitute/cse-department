@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Register — MedChain{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <div class="text-center mb-3">
+                <i class="bi bi-person-plus-fill text-accent" style="font-size:2.5rem"></i>
+                <h3 class="mt-2">Create Account</h3>
+            </div>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-person"></i> Full Name *</label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-at"></i> Username *</label>
+                    <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-lock"></i> Password *</label>
+                    <input type="password" name="password" class="form-control" placeholder="Choose a password" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-people"></i> Role *</label>
+                    <select name="role" id="roleSelect" class="form-select" required onchange="toggleSpec()">
+                        <option value="patient">Patient</option>
+                        <option value="doctor">Doctor</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="specDiv" style="display:none">
+                    <label class="form-label"><i class="bi bi-heart-pulse"></i> Specialization *</label>
+                    <select name="specialization" class="form-select">
+                        <option value="">-- Select --</option>
+                        {% for s in specializations %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="bi bi-envelope"></i> Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email (optional)">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="bi bi-telephone"></i> Phone</label>
+                        <input type="text" name="phone" class="form-control" placeholder="Phone (optional)">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-person-plus"></i> Register
+                </button>
+            </form>
+            <p class="text-center mt-3 mb-0">
+                Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleSpec() {
+    document.getElementById('specDiv').style.display =
+        document.getElementById('roleSelect').value === 'doctor' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
