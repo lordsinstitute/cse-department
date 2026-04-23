@@ -1,0 +1,38 @@
+#include <Wire.h>
+#include <MPU6050.h>
+#include <SoftwareSerial.h>
+
+MPU6050 mpu;
+SoftwareSerial BT(10, 11); // RX, TX
+
+int ax, ay, az;
+int servoX, servoY;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Wire.begin();
+  mpu.initialize();
+
+  if (!mpu.testConnection()) {
+    Serial.println("MPU6050 not connected");
+  }
+}
+
+void loop() {
+  mpu.getAcceleration(&ax, &ay, &az);
+
+  // Map tilt to servo angles
+  servoX = map(ax, -17000, 17000, 0, 180);
+  servoY = map(ay, -17000, 17000, 0, 180);
+
+  servoX = constrain(servoX, 0, 180);
+  servoY = constrain(servoY, 0, 180);
+
+  // Send data
+  BT.print(servoX);
+  BT.print(",");
+  BT.println(servoY);
+
+  delay(50); // fast response
+}
