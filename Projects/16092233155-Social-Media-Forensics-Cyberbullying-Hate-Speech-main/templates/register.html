@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Register — HateSpeech Analyzer{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="bi bi-person-plus"></i> Create Account</h4>
+                <p class="text-muted mb-0">Register a new account</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-person"></i> Full Name</label>
+                        <input type="text" class="form-control" name="name" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-at"></i> Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-lock"></i> Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                </form>
+                <hr class="border-secondary">
+                <p class="text-center mb-0">
+                    Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

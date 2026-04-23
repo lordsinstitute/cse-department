@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}History — HateSpeech Analyzer{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-history"></i> Analysis History</h2>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-ul"></i> Your Past Analyses</span>
+        <span class="badge bg-secondary">{{ predictions|length }} total</span>
+    </div>
+    <div class="card-body">
+        {% if predictions %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Text</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Length</th>
+                        <th>Words</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in predictions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td style="max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ p['input_text'] }}">
+                            {{ p['input_text'][:60] }}{% if p['input_text']|length > 60 %}...{% endif %}
+                        </td>
+                        <td>
+                            {% if p['prediction'] == 'Hate Speech' %}
+                            <span class="badge badge-hate"><i class="bi bi-exclamation-triangle"></i> {{ p['prediction'] }}</span>
+                            {% elif p['prediction'] == 'Offensive' %}
+                            <span class="badge badge-offensive"><i class="bi bi-exclamation-circle"></i> {{ p['prediction'] }}</span>
+                            {% else %}
+                            <span class="badge badge-clean"><i class="bi bi-check-circle"></i> {{ p['prediction'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ p['confidence'] }}%</td>
+                        <td>{{ p['text_length'] }}</td>
+                        <td>{{ p['word_count'] }}</td>
+                        <td>{{ p['created_at'][:16] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No analyses yet. <a href="{{ url_for('predict') }}">Analyze your first text</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

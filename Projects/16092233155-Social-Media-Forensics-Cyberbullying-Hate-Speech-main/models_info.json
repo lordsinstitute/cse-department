@@ -1,0 +1,151 @@
+{
+  "models": {
+    "Logistic Regression": {
+      "accuracy": 94.83,
+      "precision": 94.83,
+      "recall": 94.83,
+      "f1": 94.81,
+      "confusion_matrix": [
+        [
+          576,
+          13,
+          46
+        ],
+        [
+          16,
+          716,
+          37
+        ],
+        [
+          16,
+          27,
+          1553
+        ]
+      ]
+    },
+    "Naive Bayes": {
+      "accuracy": 94.83,
+      "precision": 94.83,
+      "recall": 94.83,
+      "f1": 94.81,
+      "confusion_matrix": [
+        [
+          576,
+          13,
+          46
+        ],
+        [
+          16,
+          716,
+          37
+        ],
+        [
+          16,
+          27,
+          1553
+        ]
+      ]
+    },
+    "SVM": {
+      "accuracy": 94.83,
+      "precision": 94.83,
+      "recall": 94.83,
+      "f1": 94.81,
+      "confusion_matrix": [
+        [
+          576,
+          13,
+          46
+        ],
+        [
+          16,
+          716,
+          37
+        ],
+        [
+          16,
+          27,
+          1553
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 94.17,
+      "precision": 94.17,
+      "recall": 94.17,
+      "f1": 94.14,
+      "confusion_matrix": [
+        [
+          564,
+          15,
+          56
+        ],
+        [
+          16,
+          716,
+          37
+        ],
+        [
+          18,
+          33,
+          1545
+        ]
+      ]
+    },
+    "Gradient Boosting": {
+      "accuracy": 94.5,
+      "precision": 94.51,
+      "recall": 94.5,
+      "f1": 94.47,
+      "confusion_matrix": [
+        [
+          567,
+          13,
+          55
+        ],
+        [
+          16,
+          715,
+          38
+        ],
+        [
+          16,
+          27,
+          1553
+        ]
+      ]
+    },
+    "KNN": {
+      "accuracy": 94.73,
+      "precision": 94.73,
+      "recall": 94.73,
+      "f1": 94.71,
+      "confusion_matrix": [
+        [
+          576,
+          13,
+          46
+        ],
+        [
+          17,
+          715,
+          37
+        ],
+        [
+          18,
+          27,
+          1551
+        ]
+      ]
+    }
+  },
+  "best_model": "Logistic Regression",
+  "train_size": 12000,
+  "test_size": 3000,
+  "n_features": 2787,
+  "labels": {
+    "0": "Hate Speech",
+    "1": "Offensive",
+    "2": "Clean"
+  }
+}
