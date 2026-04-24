@@ -1,0 +1,54 @@
+# Environment & Secrets
+.env
+.envrc
+
+# Virtual Environment
+fnis/
+venv/
+env/
+.venv
+ENV/
+
+# Project Data & Models
+data/
+models/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+*.pkl
+*.onnx
+
+# Python Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursorignore
+.cursorindexingignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test Coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# Project-Specific
+FNIS_Paper.tex
+logs/*.jsonl
