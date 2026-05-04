@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}{{ patient['name'] }} — Progression{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline-line {
+        position: absolute; left: 24px; top: 0; bottom: 0;
+        width: 2px; background: rgba(20,184,166,0.2);
+    }
+    .timeline-item { position: relative; padding-left: 60px; margin-bottom: 24px; }
+    .timeline-dot {
+        position: absolute; left: 14px; top: 8px;
+        width: 20px; height: 20px; border-radius: 50%;
+        border: 3px solid; display: flex; align-items: center; justify-content: center;
+        font-size: 0.6rem; font-weight: 700;
+        background: #0f172a;
+    }
+    .trend-improvement { color: #22c55e; }
+    .trend-worsening { color: #ef4444; }
+    .trend-stable { color: #94a3b8; }
+    .trend-initial { color: #14b8a6; }
+    .scan-card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px; padding: 1rem;
+    }
+    .progression-summary {
+        background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(20,184,166,0.03));
+        border: 1px solid rgba(20,184,166,0.2);
+        border-radius: 10px; padding: 1rem;
+    }
+    .grade-arrow { font-size: 1.4rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Patient Header -->
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div>
+        <a href="{{ url_for('patients') }}" class="text-muted text-decoration-none" style="font-size:0.85rem;">
+            <i class="bi bi-arrow-left"></i> All Patients
+        </a>
+        <h2 class="mt-1 mb-0"><i class="bi bi-person-circle"></i> {{ patient['name'] }}</h2>
+        <p class="text-muted mb-0">
+            {% if patient['age'] %}{{ patient['age'] }} years{% endif %}
+            {% if patient['gender'] %} · {{ patient['gender'] }}{% endif %}
+            · Added {{ patient['created_at'][:10] }}
+        </p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('predict') }}" class="btn btn-scan">
+            <i class="bi bi-upload"></i> New X-Ray Scan
+        </a>
+        <form method="POST" action="{{ url_for('delete_patient', patient_id=patient['id']) }}"
+              onsubmit="return confirm('Delete patient record? Scans will be unlinked but not deleted.')">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if patient['notes'] %}
+<div class="card mb-4">
+    <div class="card-body">
+        <small class="text-muted text-uppercase" style="letter-spacing:0.05em;">Clinical Notes</small>
+        <p class="mb-0 mt-1">{{ patient['notes'] }}</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Progression Summary -->
+{% if progression|length >= 2 %}
+<div class="progression-summary mb-4">
+    <h6 class="text-teal mb-3"><i class="bi bi-graph-up"></i> Progression Summary ({{ progression|length }} scans)</h6>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        {% set first = progression[0] %}
+        {% set last = progression[-1] %}
+        <div class="text-center">
+            <div class="badge badge-{{ first['prediction']|lower }} mb-1">{{ first['prediction'] }}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ first['scan_date'][:10] }}<br>First Scan</div>
+        </div>
+        <div style="font-size:2rem; color:#14b8a6;">→</div>
+        <div class="text-center">
+            <div class="badge badge-{{ last['prediction']|lower }} mb-1">{{ last['prediction'] }}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ last['scan_date'][:10] }}<br>Latest Scan</div>
+        </div>
+        <div class="ms-3">
+            {% if last['grade_severity'] < first['grade_severity'] %}
+            <span class="trend-improvement"><i class="bi bi-arrow-down-circle-fill"></i> Overall Improvement</span>
+            <div style="font-size:0.8rem; color:#94a3b8;">Condition improved from {{ first['prediction'] }} to {{ last['prediction'] }}</div>
+            {% elif last['grade_severity'] > first['grade_severity'] %}
+            <span class="trend-worsening"><i class="bi bi-arrow-up-circle-fill"></i> Overall Worsening</span>
+            <div style="font-size:0.8rem; color:#94a3b8;">Condition worsened from {{ first['prediction'] }} to {{ last['prediction'] }}</div>
+            {% else %}
+            <span class="trend-stable"><i class="bi bi-dash-circle-fill"></i> Stable Condition</span>
+            <div style="font-size:0.8rem; color:#94a3b8;">No significant change over {{ progression|length }} scans</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Timeline -->
+{% if progression %}
+<h5 class="mb-3"><i class="bi bi-clock-history"></i> Scan Timeline</h5>
+<div style="position:relative;">
+    <div class="timeline-line"></div>
+    {% for entry in progression %}
+    <div class="timeline-item">
+        <!-- Timeline dot colored by grade -->
+        <div class="timeline-dot"
+             style="border-color: {{ grade_colors.get(entry['prediction'], '#14b8a6') }};
+                    color: {{ grade_colors.get(entry['prediction'], '#14b8a6') }};">
+            {{ loop.index }}
+        </div>
+
+        <div class="scan-card">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                <div>
+                    <span class="badge badge-{{ entry['prediction']|lower }} me-2">
+                        {{ entry['prediction'] }}
+                    </span>
+                    <small class="text-muted">{{ entry['scan_date'] }}</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('download_report', pred_id=entry['id']) }}"
+                       class="btn btn-sm btn-outline-teal" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Trend indicator (skip for first scan) -->
+            {% if entry['trend'] != 'initial' %}
+            <div class="mb-2 trend-{{ entry['trend'] }}" style="font-size:0.85rem;">
+                {% if entry['trend'] == 'improvement' %}
+                <i class="bi bi-arrow-down-circle-fill"></i>
+                {% elif entry['trend'] == 'worsening' %}
+                <i class="bi bi-arrow-up-circle-fill"></i>
+                {% else %}
+                <i class="bi bi-dash-circle-fill"></i>
+                {% endif %}
+                {{ entry['trend_text'] }}
+            </div>
+            {% else %}
+            <div class="mb-2 trend-initial" style="font-size:0.85rem;">
+                <i class="bi bi-flag-fill"></i> Initial scan
+            </div>
+            {% endif %}
+
+            <!-- Images row -->
+            <div class="d-flex gap-2">
+                <div style="flex:1; max-width:100px;">
+                    <img src="/{{ entry['image_path'] }}" alt="X-Ray"
+                         style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:0.7rem; color:#94a3b8; text-align:center; margin-top:2px;">X-Ray</div>
+                </div>
+                {% if entry['gradcam_path'] %}
+                <div style="flex:1; max-width:100px;">
+                    <img src="/{{ entry['gradcam_path'] }}" alt="Grad-CAM"
+                         style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:0.7rem; color:#94a3b8; text-align:center; margin-top:2px;">Grad-CAM</div>
+                </div>
+                {% endif %}
+                <div style="flex:2;">
+                    <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:4px;">Confidence: {{ entry['confidence'] }}%</div>
+                    {% if entry['models_used'] %}
+                    <div style="font-size:0.75rem; color:#94a3b8;">{{ entry['models_used'] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-4">
+        <i class="bi bi-x-ray text-muted" style="font-size:3rem;"></i>
+        <p class="text-muted mt-3 mb-3">No scans linked to this patient yet.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-scan">
+            <i class="bi bi-upload"></i> Upload First X-Ray
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

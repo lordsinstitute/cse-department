@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+
+{% block extra_css %}
+<style>
+    .grade-card {
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px; padding: 1rem; height: 100%;
+    }
+    .arch-step {
+        background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(20, 184, 166, 0.2);
+        border-radius: 10px; padding: 1rem; text-align: center;
+    }
+    .arch-arrow { display: flex; align-items: center; justify-content: center; color: #14b8a6; font-size: 1.5rem; }
+    .tech-badge {
+        background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.3);
+        border-radius: 8px; padding: 0.4rem 0.8rem; display: inline-block; margin: 0.2rem; font-size: 0.85rem;
+    }
+    .layer-item {
+        background: rgba(20, 184, 166, 0.06); border-left: 3px solid #14b8a6;
+        padding: 0.5rem 1rem; margin-bottom: 0.5rem; border-radius: 0 6px 6px 0; font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> About This Project</h2>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-file-text"></i> Project Overview</div>
+    <div class="card-body">
+        <h5 class="text-teal">Predict and Classify Knee Osteoarthritis from X-Ray Imagery</h5>
+        <p>This system uses a pre-trained MobileNetV2 deep learning model (transfer learning) to classify knee X-ray images into 5 severity grades based on the <strong>Kellgren-Lawrence (KL) grading scale</strong> — the international standard for osteoarthritis assessment.</p>
+        <p class="mb-0">Knee osteoarthritis (OA) is a degenerative joint disease affecting millions worldwide. Early and accurate grading from X-ray images enables timely intervention, potentially slowing disease progression and improving patient outcomes.</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-list-ol"></i> Kellgren-Lawrence (KL) Grading Scale</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4 col-lg">
+                <div class="grade-card" style="border-top: 3px solid #22c55e;">
+                    <h6 class="grade-normal"><i class="bi bi-0-circle-fill"></i> Grade 0 — Normal</h6>
+                    <p class="small mb-0">No radiographic features of OA. Normal joint space, smooth bone contours, no osteophytes.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="grade-card" style="border-top: 3px solid #84cc16;">
+                    <h6 class="grade-doubtful"><i class="bi bi-1-circle-fill"></i> Grade 1 — Doubtful</h6>
+                    <p class="small mb-0">Questionable presence of OA. Possible slight joint space narrowing and minute osteophyte formation.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="grade-card" style="border-top: 3px solid #eab308;">
+                    <h6 class="grade-mild"><i class="bi bi-2-circle-fill"></i> Grade 2 — Mild</h6>
+                    <p class="small mb-0">Definite osteophytes and possible joint space narrowing. Early degenerative changes visible.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="grade-card" style="border-top: 3px solid #f97316;">
+                    <h6 class="grade-moderate"><i class="bi bi-3-circle-fill"></i> Grade 3 — Moderate</h6>
+                    <p class="small mb-0">Multiple moderate osteophytes, definite narrowing, some sclerosis, possible bone deformity.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="grade-card" style="border-top: 3px solid #ef4444;">
+                    <h6 class="grade-severe"><i class="bi bi-4-circle-fill"></i> Grade 4 — Severe</h6>
+                    <p class="small mb-0">Large osteophytes, marked narrowing, severe sclerosis, definite bone deformity. May need surgery.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-diagram-3"></i> System Architecture</div>
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col"><div class="arch-step"><i class="bi bi-upload d-block mb-1" style="font-size:1.5rem;"></i><strong>Upload</strong><br><small class="text-muted">Knee X-Ray</small></div></div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col"><div class="arch-step"><i class="bi bi-image d-block mb-1" style="font-size:1.5rem;"></i><strong>Preprocess</strong><br><small class="text-muted">RGB, 224x224, Normalize</small></div></div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col"><div class="arch-step"><i class="bi bi-cpu d-block mb-1" style="font-size:1.5rem;"></i><strong>MobileNetV2</strong><br><small class="text-muted">Transfer Learning</small></div></div>
+            <div class="col-auto arch-arrow"><i class="bi bi-arrow-right"></i></div>
+            <div class="col"><div class="arch-step"><i class="bi bi-clipboard2-pulse d-block mb-1" style="font-size:1.5rem;"></i><strong>KL Grade</strong><br><small class="text-muted">0-4 with confidence</small></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-layers"></i> MobileNetV2 Architecture</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-teal mb-3">Feature Extraction (Frozen)</h6>
+                <div class="layer-item"><strong>Input:</strong> 3 x 224 x 224 (RGB X-ray)</div>
+                <div class="layer-item"><strong>MobileNetV2 Backbone:</strong> Pre-trained on ImageNet (1.4M images, 1000 classes)</div>
+                <div class="layer-item"><strong>Inverted Residuals:</strong> 19 bottleneck blocks with depthwise separable convolutions</div>
+                <div class="layer-item"><strong>Output Features:</strong> 1,280-dimensional feature vector</div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-teal mb-3">Classification (Trainable)</h6>
+                <div class="layer-item"><strong>Dropout:</strong> 0.5 (regularization)</div>
+                <div class="layer-item"><strong>Dense Layer:</strong> 1280 → 5 classes</div>
+                <div class="layer-item"><strong>Output:</strong> Softmax probabilities for 5 KL grades</div>
+
+                <h6 class="text-teal mt-4 mb-2">Training Parameters</h6>
+                <table class="table table-sm">
+                    <tr><td class="text-muted">Loss Function</td><td>Cross-Entropy Loss</td></tr>
+                    <tr><td class="text-muted">Optimizer</td><td>Adam (lr=0.0001)</td></tr>
+                    <tr><td class="text-muted">Epochs</td><td>15</td></tr>
+                    <tr><td class="text-muted">Batch Size</td><td>32</td></tr>
+                    <tr><td class="text-muted">Input Size</td><td>224 x 224 pixels (RGB)</td></tr>
+                    <tr><td class="text-muted">Transfer Learning</td><td>ImageNet weights (frozen)</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-stack"></i> Technology Stack</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <h6 class="text-teal">Backend</h6>
+                <span class="tech-badge">Python</span><span class="tech-badge">Flask</span><span class="tech-badge">SQLite</span><span class="tech-badge">Werkzeug</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-teal">Deep Learning</h6>
+                <span class="tech-badge">PyTorch</span><span class="tech-badge">TorchVision</span><span class="tech-badge">MobileNetV2</span><span class="tech-badge">Transfer Learning</span>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-teal">Frontend</h6>
+                <span class="tech-badge">Bootstrap 5</span><span class="tech-badge">Chart.js</span><span class="tech-badge">Jinja2</span><span class="tech-badge">Bootstrap Icons</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-database"></i> Dataset Information</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col"><div class="stat-card"><h3>1,500</h3><p>Total X-Ray Images</p></div></div>
+            <div class="col"><div class="stat-card"><h3>5</h3><p>KL Grade Classes</p></div></div>
+            <div class="col"><div class="stat-card"><h3>224x224</h3><p>Image Resolution</p></div></div>
+            <div class="col"><div class="stat-card"><h3>80/20</h3><p>Train/Test Split</p></div></div>
+        </div>
+        <p class="text-muted mt-3 mb-0"><i class="bi bi-info-circle"></i> Synthetic knee X-ray images generated with progressive joint degeneration features (joint space narrowing, osteophytes, sclerosis, bone cysts, deformity) for each KL grade.</p>
+    </div>
+</div>
+{% endblock %}

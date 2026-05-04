@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-history"></i> Scan History</h2>
+
+{% if scans %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table"></i> All Predictions ({{ scans|length }})</span>
+        <a href="{{ url_for('predict') }}" class="btn btn-sm btn-scan"><i class="bi bi-plus-circle"></i> New Scan</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>KL Grade</th>
+                        <th>Confidence</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Report</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr>
+                        <td>{{ scan['id'] }}</td>
+                        <td><img src="/{{ scan['image_path'] }}" alt="X-Ray" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"></td>
+                        <td>
+                            <span class="badge badge-{{ scan['prediction']|lower }}">
+                                {{ scan['prediction'] }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 80px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: {{ scan['confidence'] }}%; height: 100%; border-radius: 3px; background: {{ grade_colors.get(scan['prediction'], '#14b8a6') }};"></div>
+                                </div>
+                                <small>{{ scan['confidence'] }}%</small>
+                            </div>
+                        </td>
+                        <td>
+                            {% if scan['patient_name'] %}
+                            <a href="{{ url_for('patient_detail', patient_id=scan['patient_id']) }}" class="text-teal" style="font-size:0.85rem;">
+                                <i class="bi bi-person"></i> {{ scan['patient_name'] }}
+                            </a>
+                            {% else %}
+                            <small class="text-muted">—</small>
+                            {% endif %}
+                        </td>
+                        <td><small class="text-muted">{{ scan['scan_date'] }}</small></td>
+                        <td>
+                            <a href="{{ url_for('download_report', pred_id=scan['id']) }}"
+                               class="btn btn-sm btn-outline-teal" title="Download PDF Report">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+        <p class="text-muted mt-3 mb-3">No scan history yet.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-scan"><i class="bi bi-upload"></i> Upload Your First X-Ray</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
