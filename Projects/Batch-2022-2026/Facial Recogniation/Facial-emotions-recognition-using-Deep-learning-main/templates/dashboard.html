@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Model Dashboard — EmotionAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-chart-bar me-2" style="color: var(--violet);"></i>Model Dashboard</h2>
+    <p>Performance metrics, training charts, and model comparison.</p>
+</div>
+
+<!-- Model Comparison Table -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-2"></i>Model Comparison
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model_name, info in metrics.items() %}
+                    <tr {% if loop.first %}style="background: rgba(139, 92, 246, 0.1);"{% endif %}>
+                        <td>
+                            {% if loop.first %}
+                            <i class="fas fa-trophy me-1" style="color: #f59e0b;"></i>
+                            {% endif %}
+                            <strong>{{ model_name }}</strong>
+                            {% if loop.first %}<span class="badge-violet ms-2" style="font-size: 0.7rem;">Best</span>{% endif %}
+                        </td>
+                        <td>
+                            <span class="fw-bold" style="color: {{ '#22c55e' if info.accuracy >= 0.7 else '#ef4444' }};">
+                                {{ '%.2f'|format(info.accuracy * 100) }}%
+                            </span>
+                        </td>
+                        <td>{{ '%.2f'|format(info.precision * 100) }}%</td>
+                        <td>{{ '%.2f'|format(info.recall * 100) }}%</td>
+                        <td>{{ '%.2f'|format(info.f1_score * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CNN Model Details -->
+{% if metrics.get('CNN (Deep Learning)') %}
+{% set cnn = metrics['CNN (Deep Learning)'] %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+            <div class="stat-value">{{ '%.1f'|format(cnn.accuracy * 100) }}%</div>
+            <div class="stat-label">CNN Accuracy</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+            <div class="stat-value">{{ cnn.epochs }}</div>
+            <div class="stat-label">Training Epochs</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-cubes"></i></div>
+            <div class="stat-value">{{ cnn.batch_size }}</div>
+            <div class="stat-label">Batch Size</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-sliders"></i></div>
+            <div class="stat-value">{{ cnn.learning_rate }}</div>
+            <div class="stat-label">Learning Rate</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Training Charts -->
+{% if charts %}
+<h4 class="mb-3"><i class="fas fa-chart-line me-2" style="color: var(--violet);"></i>Training & Evaluation Charts</h4>
+<div class="row g-4">
+    {% for chart in charts %}
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-2"></i>{{ chart.title }}
+            </div>
+            <div class="card-body p-2 text-center">
+                <img src="{{ url_for('static', filename='charts/' + chart.file) }}"
+                     class="img-fluid rounded" alt="{{ chart.title }}"
+                     style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-4">
+        <i class="fas fa-chart-bar fa-3x mb-3" style="color: var(--violet); opacity: 0.4;"></i>
+        <p class="text-secondary">No training charts available. Run train_model.py to generate charts.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
