@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mt-3">
+    <h2 class="fw-bold mb-1"><i class="bi bi-bar-chart"></i> Dashboard</h2>
+    <p class="text-muted">Analytics and insights from your vulnerability scans</p>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ total_scans }}</h2>
+                <p>Total Findings</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ total_sites }}</h2>
+                <p>Websites Scanned</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>11</h2>
+                <p>Vulnerability Checks</p>
+            </div>
+        </div>
+    </div>
+
+    {% if admin_stats %}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ admin_stats.total_users }}</h2>
+                <p>Registered Users</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ admin_stats.total_scans }}</h2>
+                <p>Total Scans (All Users)</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card">
+                <h2>{{ admin_stats.unique_sites }}</h2>
+                <p>Unique Sites Scanned</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card p-3">
+                <h5 class="text-info mb-3">Vulnerability Distribution</h5>
+                <canvas id="vulnChart" height="260"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card p-3">
+                <h5 class="text-info mb-3">Severity Breakdown</h5>
+                <canvas id="severityChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card p-3">
+                <h5 class="text-info mb-3">Findings per Website</h5>
+                <canvas id="siteChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const vulnData = {{ vuln_data | safe }};
+    const severityData = {{ severity_data | safe }};
+    const siteData = {{ site_data | safe }};
+
+    const colors = ['#f85149','#f0883e','#d29922','#58a6ff','#3fb950','#bc8cff','#f778ba','#79c0ff','#7ee787','#ffa657'];
+    const sevColors = {'Critical':'#f85149','High':'#f0883e','Medium':'#d29922','Low':'#58a6ff','None':'#3fb950'};
+
+    // Vulnerability Distribution (Doughnut)
+    new Chart(document.getElementById('vulnChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(vulnData),
+            datasets: [{
+                data: Object.values(vulnData),
+                backgroundColor: colors.slice(0, Object.keys(vulnData).length),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'right', labels: { color: '#c9d1d9', font: { size: 11 } } } },
+            responsive: true
+        }
+    });
+
+    // Severity Breakdown (Pie)
+    new Chart(document.getElementById('severityChart'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(severityData),
+            datasets: [{
+                data: Object.values(severityData),
+                backgroundColor: Object.keys(severityData).map(k => sevColors[k] || '#8b949e'),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'right', labels: { color: '#c9d1d9', font: { size: 11 } } } },
+            responsive: true
+        }
+    });
+
+    // Sites Bar Chart
+    new Chart(document.getElementById('siteChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(siteData).map(u => u.length > 40 ? u.substring(0,40)+'...' : u),
+            datasets: [{
+                label: 'Findings',
+                data: Object.values(siteData),
+                backgroundColor: '#e63946',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#8b949e', font: { size: 10 } }, grid: { color: '#21262d' } },
+                y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}
